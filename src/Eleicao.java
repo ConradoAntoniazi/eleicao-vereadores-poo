@@ -75,9 +75,54 @@ public class Eleicao {
     }
 
     public void processarVotos(String caminhoArquivo) {
-        // Lógica para ler e processar o CSV de votação
-    }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(caminhoArquivo), "ISO-8859-1"))) {
+            String linha;
+            boolean primeiraLinha = true;
+    
+            while ((linha = br.readLine()) != null) {
+                if (primeiraLinha) {
+                    primeiraLinha = false;
+                    continue;
+                }
+    
+                String[] campos = linha.split(";");
+    
+                try {
+                    int codigoCargo = Integer.parseInt(campos[17].trim().replace("\"", "")); // CD_CARGO
+                    int codigoMunicipio = Integer.parseInt(campos[13].trim().replace("\"", "")); // CD_MUNICIPIO
+                    int numeroVotavel = Integer.parseInt(campos[19].trim().replace("\"", "")); // NR_VOTAVEL
+                    int quantidadeVotos = Integer.parseInt(campos[21].trim().replace("\"", "")); // QT_VOTOS
+    
+                    if (codigoCargo != 13 || codigoMunicipio != this.codigoCidade) {
+                        continue;
+                    }
+    
+                    if (numeroVotavel >= 95 && numeroVotavel <= 98) {
+                        continue;
+                    }
+    
+                    // Verifica se é voto nominal (candidato) ou de legenda (partido)
+                    if (this.candidatos.containsKey(numeroVotavel)) {
+                        Candidato candidato = this.candidatos.get(numeroVotavel);
+                        candidato.addVotos(quantidadeVotos);
 
+                    } else if (this.partidos.containsKey(String.valueOf(numeroVotavel))) {
+                        Partido partido = this.partidos.get(String.valueOf(numeroVotavel));
+                        partido.addVotosLegenda(quantidadeVotos);
+
+                    }
+    
+                } catch (NumberFormatException e) {
+                    System.err.println("Erro ao converter número na linha ignorada: " + e.getMessage());
+                    continue;
+                }
+            }
+    
+        } catch (IOException e) {
+            System.err.println("Erro ao ler o arquivo de votação: " + e.getMessage());
+        }
+    }
+    
     public void gerarRelatorios() {
         // Geração dos relatórios exigidos
     }

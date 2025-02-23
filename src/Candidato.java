@@ -31,6 +31,10 @@ public class Candidato {
     public int getVotos() {
         return this.votos;
     }
+
+    public void addVotos(int votos) {
+        this.votos += votos;
+    }
     
     public Genero getGenero(){
         return this.genero;
@@ -48,6 +52,6 @@ public class Candidato {
 
     @Override
     public String toString() {
-        return "NOME: " + this.nomeUrna + " (" + this.numero + ") " + this.partido;
+        return "NOME: " + this.nomeUrna + " (" + this.numero + ") " + "VOTOS: " + this.votos;
     }
 }

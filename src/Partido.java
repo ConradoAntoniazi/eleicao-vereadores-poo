@@ -36,6 +36,10 @@ public class Partido {
         return votosLegenda;
     }
 
+    public void addVotosLegenda(int votos) {
+        this.votosLegenda += votos;
+    }
+
     public LinkedList<Candidato> getCandidatos() {
         return candidatos;
     }
@@ -50,6 +54,6 @@ public class Partido {
 
     @Override
     public String toString() {
-        return "Nome: " + this.nome + " (" + this.sigla + ") " + this.numero; 
+        return "NOME: " + this.nome + " (" + this.sigla + ") " + this.numero + " VOTOS: " + this.votosLegenda; 
     }
 }
