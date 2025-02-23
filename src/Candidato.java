@@ -1,66 +1,53 @@
-import java.time.LocalDate;
-
 public class Candidato {
     private int numero;
     private String nomeUrna;
     private Partido partido;
-    private boolean eleito;
     private int votos;
-    private LocalDate dataNascimento;
+    private String dataNascimento;
+    private Genero genero;
+    private SituacaoEleitoral situacaoEleitoral;
     
-    public Candidato (int numero, String nome, Partido partido, LocalDate dataNasc) {
+    public Candidato (int numero, String nome, Partido partido, String dataNasc, int genero, int situacao) {
         this.numero = numero;
         this.nomeUrna = nome;
         this.partido = partido;
         this.dataNascimento = dataNasc;
+        this.genero = Genero.fromCodigo(genero);
+        this.situacaoEleitoral = SituacaoEleitoral.fromCodigo(situacao);
     }
 
     public int getNumero() {
-        return numero;
-    }
-
-    public void setNumero(int numero) {
-        this.numero = numero;
+        return this.numero;
     }
 
     public String getNomeUrna() {
-        return nomeUrna;
-    }
-
-    public void setNomeUrna(String nomeUrna) {
-        this.nomeUrna = nomeUrna;
+        return this.nomeUrna;
     }
 
     public Partido getPartido() {
-        return partido;
+        return this.partido;
     }
-
-    public void setPartido(Partido partido) {
-        this.partido = partido;
-    }
-
-    public boolean isEleito() {
-        return eleito;
-    }
-
-    public void setEleito(boolean eleito) {
-        this.eleito = eleito;
-    }
-
+    
     public int getVotos() {
-        return votos;
+        return this.votos;
+    }
+    
+    public Genero getGenero(){
+        return this.genero;
+    }
+    
+    public String getDataNascimento() {
+        return this.dataNascimento;
+    }
+    
+    public boolean isEleito() {
+        return this.situacaoEleitoral == SituacaoEleitoral.ELEITO ||
+                this.situacaoEleitoral == SituacaoEleitoral.ELEITO_POR_QUOCIENTE_PARTIDARIO ||
+                this.situacaoEleitoral == SituacaoEleitoral.ELEITO_POR_MEDIA;
     }
 
-    public void setVotos(int votos) {
-        this.votos = votos;
+    @Override
+    public String toString() {
+        return "NOME: " + this.nomeUrna + " (" + this.numero + ") " + this.partido;
     }
-
-    public LocalDate getDataNascimento() {
-        return dataNascimento;
-    }
-
-    public void setDataNascimento(LocalDate dataNascimento) {
-        this.dataNascimento = dataNascimento;
-    }
-
 }
