@@ -52,6 +52,18 @@ public class Partido {
         this.candidatos.add(candidato);
     }
 
+    public int getVotosNominais() {
+        return this.candidatos.stream().mapToInt(Candidato::getVotos).sum();
+    }
+    
+    public int getTotalVotos() {
+        return this.votosLegenda + this.getVotosNominais();
+    }
+    
+    public int getNumEleitos() {
+        return (int) this.candidatos.stream().filter(Candidato::isEleito).count();
+    }
+
     @Override
     public String toString() {
         return "NOME: " + this.nome + " (" + this.sigla + ") " + this.numero + " VOTOS: " + this.votosLegenda; 

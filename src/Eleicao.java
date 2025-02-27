@@ -184,12 +184,46 @@ public class Eleicao {
         }
     }    
     
+    private void geraRelatorioVotacaoPartidos() {
+        NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
+        
+        // Converter HashMap para lista e ordenar
+        List<Partido> partidosOrdenados = new ArrayList<>(this.partidos.values());
+        
+        partidosOrdenados.sort((p1, p2) -> {
+            int comparacaoVotos = Integer.compare(p2.getTotalVotos(), p1.getTotalVotos());
+            if (comparacaoVotos != 0) return comparacaoVotos;
+            else return Integer.compare(p1.getNumero(), p2.getNumero());
+        });
+        
+        // Imprimir cabeçalho
+        System.out.println("\nVotação dos partidos e número de candidatos eleitos:");
+        
+        int posicao = 1;
+        for (Partido partido : partidosOrdenados) {
+            int votosNominais = partido.getVotosNominais();
+            int votosLegenda = partido.getVotosLegenda();
+            int totalVotos = partido.getTotalVotos();
+            int numEleitos = partido.getNumEleitos();
+            
+            System.out.printf("%d - %s - %d, %s votos (%s nominais e %s de legenda), %d candidato(s) eleito(s)%n",
+                posicao++,
+                partido.getSigla(),
+                partido.getNumero(),
+                brFormat.format(totalVotos),
+                brFormat.format(votosNominais),
+                brFormat.format(votosLegenda),
+                numEleitos
+            );
+        }
+    }
+
     public void gerarRelatorios() {
 
         System.out.println("Número de vagas: " + this.numEleitos + "\n"); //Relatório 1
         this.geraRelatorioVereadoresEleitos(); //Relatório 2
         this.geraRelatoriosSobreMaisVotados(); //Relatórios 3, 4 e 5
-
+        this.geraRelatorioVotacaoPartidos(); //Relatório 6
     }
 
     @Override
