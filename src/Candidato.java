@@ -21,7 +21,8 @@ public class Candidato {
     }
 
     public String getNomeUrna() {
-        return this.nomeUrna;
+        if(this.partido.getNumeroFederacao() == -1) return nomeUrna;
+        return "*" + this.nomeUrna;
     }
 
     public Partido getPartido() {

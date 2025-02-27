@@ -12,8 +12,9 @@ public class App {
         eleicao.processarCandidatosPartidos("../in/" + pathCandidatos);
         eleicao.processarVotos("../in/" + pathVotacao);
 
-        eleicao.imprimirPartidos();
-        System.out.println("");
-        eleicao.imprimirCandidatos();
+        //eleicao.imprimirPartidos();
+        //System.out.println("");
+        //eleicao.imprimirCandidatos();
+        eleicao.gerarRelatorios();
     }
 }
