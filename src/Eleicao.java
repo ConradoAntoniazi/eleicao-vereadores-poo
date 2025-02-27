@@ -1,13 +1,8 @@
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.text.NumberFormat;
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.time.*;
+import java.time.format.*;
 
 public class Eleicao {
     private int codigoCidade;
@@ -133,13 +128,14 @@ public class Eleicao {
 
     private void geraRelatorioVereadoresEleitos() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
+        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         ArrayList<Candidato> candidatosEleitos = new ArrayList<Candidato>();
 
         for(Candidato candidato : this.candidatos.values()) {
             if(candidato.isEleito()) candidatosEleitos.add(candidato);
         }
 
-        candidatosEleitos.sort(Comparator.comparingInt(Candidato::getVotos).reversed());
+        candidatosEleitos.sort(Comparator.comparingInt(Candidato::getVotos).reversed().thenComparing(candidato -> LocalDate.parse(candidato.getDataNascimento(), formatDate)));
 
         int i = 0;
         System.out.println("Vereadores eleitos:");
@@ -151,10 +147,11 @@ public class Eleicao {
 
     private void geraRelatoriosSobreMaisVotados() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
+        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         List<Candidato> candidatosMaisVotados = new ArrayList<>(candidatos.values());
     
         //Ordena o array de candidatos
-        candidatosMaisVotados.sort(Comparator.comparingInt(Candidato::getVotos).reversed());
+        candidatosMaisVotados.sort(Comparator.comparingInt(Candidato::getVotos).reversed().thenComparing(candidato -> LocalDate.parse(candidato.getDataNascimento(), formatDate)));
     
         List<Candidato> candidatosSeriamEleitos = new ArrayList<>();
         List<Candidato> candidatosEleitosPorProporcionalidade = new ArrayList<>();
