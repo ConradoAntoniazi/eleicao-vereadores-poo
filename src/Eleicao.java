@@ -314,6 +314,25 @@ public class Eleicao {
         System.out.printf("60 <= Idade    : %d (%s)%n", faixas[4], percentFormat.format((double) faixas[4]/total));
     }
 
+    private void geraRelatorioGenero() {
+        int feminino = 0;
+        int masculino = 0;
+        
+        for (Candidato candidato : this.candidatosEleitos) {
+            Genero genero = candidato.getGenero();
+            if (genero == Genero.FEMININO) feminino++;
+            else if (genero == Genero.MASCULINO) masculino++;
+        }
+    
+        int total = this.numEleitos;
+        NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.forLanguageTag("pt-BR"));
+        percentFormat.setMinimumFractionDigits(2);
+    
+        System.out.println("\nEleitos, por gênero:");
+        System.out.printf("Feminino: %d (%s)%n", feminino, (total == 0) ? "0,00%" : percentFormat.format((double) feminino / total));
+        System.out.printf("Masculino: %d (%s)%n", masculino, (total == 0) ? "0,00%" : percentFormat.format((double) masculino / total));
+    }
+
     public void gerarRelatorios() {
 
         System.out.println("Número de vagas: " + this.numEleitos + "\n"); // Relatório 1
@@ -322,6 +341,7 @@ public class Eleicao {
         this.geraRelatorioVotacaoPartidos(); // Relatório 6
         this.geraRelatorioPrimeiroUltimoPartido(); // Relatório 7
         this.geraRelatorioFaixaEtaria(); // Relatório 8
+        this.geraRelatorioGenero(); //Relatório 9
     }
 
     @Override
