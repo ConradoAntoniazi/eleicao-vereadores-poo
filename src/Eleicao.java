@@ -11,6 +11,7 @@ public class Eleicao {
     private int numEleitos;
     private HashMap<Integer, Candidato> candidatos;
     private HashMap<Integer, Partido> partidos;
+    private ArrayList<Candidato> candidatosEleitos = new ArrayList<>();
 
     public Eleicao(int codigo, String data) {
         this.codigoCidade = codigo;
@@ -73,9 +74,11 @@ public class Eleicao {
                 // Incrementa o número de eleitos da eleição
                 if (candAux.isEleito())
                     this.numEleitos++;
+                    this.candidatosEleitos.add(candAux);
 
                 this.candidatos.put(numero, candAux);
                 partAux.addCandidato(candAux);
+                
             }
 
         } catch (IOException e) {
@@ -286,13 +289,39 @@ public class Eleicao {
         }
     }
 
+    private void geraRelatorioFaixaEtaria() {
+        int[] faixas = new int[5]; // [<30, 30-39, 40-49, 50-59, >=60]
+        
+        for (Candidato candidato : this.candidatosEleitos) {
+            int idade = candidato.getIdade(this.data);
+            
+            if (idade < 30) faixas[0]++;
+            else if (idade < 40) faixas[1]++;
+            else if (idade < 50) faixas[2]++;
+            else if (idade < 60) faixas[3]++;
+            else faixas[4]++;
+        }
+    
+        int total = this.numEleitos;
+        NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.forLanguageTag("pt-BR"));
+        percentFormat.setMinimumFractionDigits(2);
+    
+        System.out.println("\nEleitos, por faixa etária (na data da eleição):");
+        System.out.printf("    Idade < 30: %d (%s)%n", faixas[0], percentFormat.format((double) faixas[0]/total));
+        System.out.printf("30 <= Idade < 40: %d (%s)%n", faixas[1], percentFormat.format((double) faixas[1]/total));
+        System.out.printf("40 <= Idade < 50: %d (%s)%n", faixas[2], percentFormat.format((double) faixas[2]/total));
+        System.out.printf("50 <= Idade < 60: %d (%s)%n", faixas[3], percentFormat.format((double) faixas[3]/total));
+        System.out.printf("60 <= Idade    : %d (%s)%n", faixas[4], percentFormat.format((double) faixas[4]/total));
+    }
+
     public void gerarRelatorios() {
 
         System.out.println("Número de vagas: " + this.numEleitos + "\n"); // Relatório 1
         this.geraRelatorioVereadoresEleitos(); // Relatório 2
         this.geraRelatoriosSobreMaisVotados(); // Relatórios 3, 4 e 5
         this.geraRelatorioVotacaoPartidos(); // Relatório 6
-        this.geraRelatorioPrimeiroUltimoPartido(); //Relatório 7
+        this.geraRelatorioPrimeiroUltimoPartido(); // Relatório 7
+        this.geraRelatorioFaixaEtaria(); // Relatório 8
     }
 
     @Override
