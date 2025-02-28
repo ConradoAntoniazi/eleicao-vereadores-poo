@@ -67,8 +67,13 @@ public class Candidato {
     }
 
     public int getIdade(String dataEleicaoStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dataEleicao = LocalDate.parse(dataEleicaoStr, formatter);
+        LocalDate dataEleicao;
+        try {
+           dataEleicao = LocalDate.parse(dataEleicaoStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Data de nascimento inválida: " + dataEleicaoStr);
+        }
+        
         return Period.between(this.dataNascimento, dataEleicao).getYears();
     }
 

@@ -161,8 +161,7 @@ public class Eleicao {
         // Ordena o array de candidatos
         candidatosMaisVotados.sort(Comparator
                 .comparingInt(Candidato::getVotos).reversed()
-                .thenComparing(Candidato::getDataNascimento)
-        );
+                .thenComparing(Candidato::getDataNascimento));
 
         List<Candidato> candidatosSeriamEleitos = new ArrayList<>();
         List<Candidato> candidatosEleitosPorProporcionalidade = new ArrayList<>();
@@ -241,12 +240,12 @@ public class Eleicao {
     private void geraRelatorioPrimeiroUltimoPartido() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
 
-        // Filtrando partidos com candidatos validos 
+        // Filtrando partidos com candidatos validos
         List<Partido> partidosValidos = new ArrayList<>(this.partidos.values());
         partidosValidos.removeIf(p -> p.getCandidatosValidos().isEmpty());
 
-        // Ordenando partidos pelo candidato mais votado (decrescente) 
-        //e número do partido (crescente)
+        // Ordenando partidos pelo candidato mais votado (decrescente)
+        // e número do partido (crescente)
         partidosValidos.sort((p1, p2) -> {
             Candidato c1 = p1.getCandidatoMaisVotado();
             Candidato c2 = p2.getCandidatoMaisVotado();
@@ -266,10 +265,10 @@ public class Eleicao {
                     .thenComparing(Candidato::getDataNascimento);
 
             List<Candidato> candidatosOrdenados = partido.getCandidatosValidos()
-                                                    .stream()
-                                                    .sorted(comparator)
-                                                    .collect(Collectors.toList());
-                
+                    .stream()
+                    .sorted(comparator)
+                    .collect(Collectors.toList());
+
             Candidato primeiro = candidatosOrdenados.get(0);
             Candidato ultimo = candidatosOrdenados.get(candidatosOrdenados.size() - 1);
 
@@ -305,11 +304,14 @@ public class Eleicao {
         }
 
         int total = this.numEleitos;
+        if (total == 0)
+            return;
+
         NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.forLanguageTag("pt-BR"));
         percentFormat.setMinimumFractionDigits(2);
 
         System.out.println("\nEleitos, por faixa etária (na data da eleição):");
-        System.out.printf("    Idade < 30: %d (%s)%n", faixas[0], percentFormat.format((double) faixas[0] / total));
+        System.out.printf("      Idade < 30: %d (%s)%n", faixas[0], percentFormat.format((double) faixas[0] / total));
         System.out.printf("30 <= Idade < 40: %d (%s)%n", faixas[1], percentFormat.format((double) faixas[1] / total));
         System.out.printf("40 <= Idade < 50: %d (%s)%n", faixas[2], percentFormat.format((double) faixas[2] / total));
         System.out.printf("50 <= Idade < 60: %d (%s)%n", faixas[3], percentFormat.format((double) faixas[3] / total));
@@ -343,21 +345,24 @@ public class Eleicao {
         // Somatorio dos nominais
         int votosNominais = this.candidatos.values().stream().mapToInt(Candidato::getVotos).sum();
 
-        // Somatorio dos nominais
+        // Somatorio das legendas
         int votosLegenda = this.partidos.values().stream().mapToInt(Partido::getVotosLegenda).sum();
 
         int totalVotosValidos = votosNominais + votosLegenda;
 
-        // Formatando números e porcentagens
+        // Formatando numeros e porcentagens
         NumberFormat numFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
         NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.forLanguageTag("pt-BR"));
         percentFormat.setMinimumFractionDigits(2);
 
+        double percentNominais = (totalVotosValidos == 0) ? 0.0 : (double) votosNominais / totalVotosValidos;
+        double percentLegenda = (totalVotosValidos == 0) ? 0.0 : (double) votosLegenda / totalVotosValidos;
+
         System.out.println("\nTotal de votos válidos:    " + numFormat.format(totalVotosValidos));
         System.out.println("Total de votos nominais:    " + numFormat.format(votosNominais) +
-                " (" + percentFormat.format((double) votosNominais / totalVotosValidos) + ")");
+                " (" + percentFormat.format(percentNominais) + ")");
         System.out.println("Total de votos de legenda: " + numFormat.format(votosLegenda) +
-                " (" + percentFormat.format((double) votosLegenda / totalVotosValidos) + ")");
+                " (" + percentFormat.format(percentLegenda) + ")");
     }
 
     public void gerarRelatorios() {
