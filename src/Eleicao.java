@@ -241,12 +241,12 @@ public class Eleicao {
     private void geraRelatorioPrimeiroUltimoPartido() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
 
-        // Filtrar partidos com candidatos válidos (votos > 0)
+        // Filtrando partidos com candidatos validos 
         List<Partido> partidosValidos = new ArrayList<>(this.partidos.values());
         partidosValidos.removeIf(p -> p.getCandidatosValidos().isEmpty());
 
-        // Ordenar partidos pelo candidato mais votado (decrescente) e número do partido
-        // (crescente)
+        // Ordenando partidos pelo candidato mais votado (decrescente) 
+        //e número do partido (crescente)
         partidosValidos.sort((p1, p2) -> {
             Candidato c1 = p1.getCandidatoMaisVotado();
             Candidato c2 = p2.getCandidatoMaisVotado();
@@ -263,11 +263,13 @@ public class Eleicao {
         for (Partido partido : partidosValidos) {
             Comparator<Candidato> comparator = Comparator
                     .comparingInt(Candidato::getVotos).reversed()
-                    .thenComparing(c -> c.getDataNascimento());
+                    .thenComparing(Candidato::getDataNascimento);
 
-            List<Candidato> candidatosOrdenados = partido.getCandidatosValidos().stream()
-                    .sorted(comparator)
-                    .collect(Collectors.toList());
+            List<Candidato> candidatosOrdenados = partido.getCandidatosValidos()
+                                                    .stream()
+                                                    .sorted(comparator)
+                                                    .collect(Collectors.toList());
+                
             Candidato primeiro = candidatosOrdenados.get(0);
             Candidato ultimo = candidatosOrdenados.get(candidatosOrdenados.size() - 1);
 
