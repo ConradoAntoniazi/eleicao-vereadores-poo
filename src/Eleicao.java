@@ -261,52 +261,76 @@ public class Eleicao {
 
     private void geraRelatorioPrimeiroUltimoPartido() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
-
-        // Filtrando partidos com candidatos validos
+    
+        // Filtrando partidos com candidatos válidos
         List<Partido> partidosValidos = new ArrayList<>(this.partidos.values());
-        //ignorando partidos sem candidatos
+        // Ignorando partidos sem candidatos
         partidosValidos.removeIf(p -> p.getCandidatos().isEmpty());
-
-        // Ordenando partidos pelo candidato mais votado (decrescente)
-        // e número do partido (crescente)
+    
+        // Ordenando partidos pelo candidato mais votado (decrescente) e número do partido (crescente)
         partidosValidos.sort((p1, p2) -> {
             Candidato c1 = p1.getCandidatoMaisVotado();
             Candidato c2 = p2.getCandidatoMaisVotado();
-
+    
+            // Verificar se os candidatos não são nulos antes de comparar os votos
+            if (c1 == null || c2 == null) {
+                return c1 == null ? 1 : -1; // Mover partidos com candidatos nulos para o final
+            }
+    
             int comparacaoVotos = Integer.compare(c2.getVotos(), c1.getVotos());
             if (comparacaoVotos != 0)
                 return comparacaoVotos;
             else
                 return Integer.compare(p1.getNumero(), p2.getNumero());
         });
-
+    
         System.out.println("\nPrimeiro e último colocados de cada partido:");
         int posicao = 1;
         for (Partido partido : partidosValidos) {
+            // Ignora partidos com apenas um candidato
+            if (partido.getCandidatos().size() == 1) {
+                continue; // Não imprime nada se o partido tiver apenas um candidato
+            }
+    
             Comparator<Candidato> comparator = Comparator
                     .comparingInt(Candidato::getVotos).reversed()
                     .thenComparing(Candidato::getDataNascimento);
-
+    
+            // Filtra candidatos nulos antes de ordenar
             List<Candidato> candidatosOrdenados = partido.getCandidatos()
                     .stream()
+                    .filter(Objects::nonNull) // Filtra candidatos nulos
                     .sorted(comparator)
                     .collect(Collectors.toList());
-
+    
+            // Verifica se a lista de candidatos não está vazia
+            if (candidatosOrdenados.isEmpty()) {
+                System.out.println("Nenhum candidato disponível no partido " + partido.getSigla());
+                continue; // Pula para o próximo partido
+            }
+    
             Candidato primeiro = candidatosOrdenados.get(0);
             Candidato ultimo = candidatosOrdenados.get(candidatosOrdenados.size() - 1);
-
-            System.out.printf("%d - %s - %d, %s (%d, %s votos) / %s (%d, %s votos)%n",
+    
+            // Pluralização de "voto" ou "votos"
+            String votoPrimeiro = (primeiro.getVotos() <= 1) ? "voto" : "votos";
+            String votoUltimo = (ultimo.getVotos() <= 1) ? "voto" : "votos";
+    
+            System.out.printf("%d - %s - %d, %s (%d, %s %s) / %s (%d, %s %s)%n",
                     posicao++,
                     partido.getSigla(),
                     partido.getNumero(),
                     primeiro.getNomeUrna(0),
                     primeiro.getNumero(),
                     brFormat.format(primeiro.getVotos()),
+                    votoPrimeiro,
                     ultimo.getNomeUrna(0),
                     ultimo.getNumero(),
-                    brFormat.format(ultimo.getVotos()));
+                    brFormat.format(ultimo.getVotos()),
+                    votoUltimo
+            );
         }
-    }
+    }        
 
     private void geraRelatorioFaixaEtaria() {
         int[] faixas = new int[5]; // [<30, 30-39, 40-49, 50-59, >=60]
@@ -398,24 +422,5 @@ public class Eleicao {
         this.geraRelatorioFaixaEtaria(); // Relatório 8
         this.geraRelatorioGenero(); // Relatório 9
         this.geraRelatorioTotalVotos(); // Relatório 10
-    }
-
-    @Override
-    public String toString() {
-        return "Eleição:\n" + "Código do município: " + this.codigoCidade + "\nData: " + this.data + "\n";
-    }
-
-    public void imprimirPartidos() {
-        System.out.println("Lista de Partidos na Eleição:");
-        for (Partido partido : partidos.values()) {
-            System.out.println(partido);
-        }
-    }
-
-    public void imprimirCandidatos() {
-        System.out.println("Lista de Candidatos na Eleição:");
-        for (Candidato candidato : candidatos.values()) {
-            System.out.println(candidato);
-        }
     }
 }
