@@ -210,7 +210,6 @@ public class Eleicao {
     private void geraRelatorioVotacaoPartidos() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
 
-        // Converter HashMap para lista e ordenar
         List<Partido> partidosOrdenados = new ArrayList<>(this.partidos.values());
 
         partidosOrdenados.sort((p1, p2) -> {
@@ -221,7 +220,7 @@ public class Eleicao {
                 return Integer.compare(p1.getNumero(), p2.getNumero());
         });
 
-        // Imprimir cabeçalho
+        //cabecalho
         System.out.println("\nVotação dos partidos e número de candidatos eleitos:");
 
         int posicao = 1;
@@ -333,6 +332,27 @@ public class Eleicao {
         System.out.printf("Masculino: %d (%s)%n", masculino, (total == 0) ? "0,00%" : percentFormat.format((double) masculino / total));
     }
 
+    private void geraRelatorioTotalVotos() {
+        // Somatorio dos nominais
+        int votosNominais = this.candidatos.values().stream().mapToInt(Candidato::getVotos).sum();
+    
+        // Somatorio dos nominais
+        int votosLegenda = this.partidos.values().stream().mapToInt(Partido::getVotosLegenda).sum();
+    
+        int totalVotosValidos = votosNominais + votosLegenda;
+    
+        // Formatando números e porcentagens
+        NumberFormat numFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
+        NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.forLanguageTag("pt-BR"));
+        percentFormat.setMinimumFractionDigits(2);
+    
+        System.out.println("\nTotal de votos válidos:    " + numFormat.format(totalVotosValidos));
+        System.out.println("Total de votos nominais:    " + numFormat.format(votosNominais) + 
+            " (" + percentFormat.format((double) votosNominais / totalVotosValidos) + ")");
+        System.out.println("Total de votos de legenda: " + numFormat.format(votosLegenda) + 
+            " (" + percentFormat.format((double) votosLegenda / totalVotosValidos) + ")");
+    }
+
     public void gerarRelatorios() {
 
         System.out.println("Número de vagas: " + this.numEleitos + "\n"); // Relatório 1
@@ -341,7 +361,8 @@ public class Eleicao {
         this.geraRelatorioVotacaoPartidos(); // Relatório 6
         this.geraRelatorioPrimeiroUltimoPartido(); // Relatório 7
         this.geraRelatorioFaixaEtaria(); // Relatório 8
-        this.geraRelatorioGenero(); //Relatório 9
+        this.geraRelatorioGenero(); // Relatório 9
+        this.geraRelatorioTotalVotos(); // Relatório 10
     }
 
     @Override
