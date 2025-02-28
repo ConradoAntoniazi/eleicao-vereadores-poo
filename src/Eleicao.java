@@ -233,42 +233,29 @@ public class Eleicao {
             int totalVotos = partido.getTotalVotos();
             int numEleitos = partido.getNumEleitos();
            
-            if(numEleitos == 0){
-                if(totalVotos == 0){
-                    System.out.printf("%d - %s - %d, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito\n",
-                    posicao++,
-                    partido.getSigla(),
-                    partido.getNumero());
-                }
-                else{
-                    System.out.printf("%d - %s - %d, %s votos (%s nominais e %s de legenda), 0 candidato eleito\n",
-                    posicao++,
-                    partido.getSigla(),
-                    partido.getNumero(),
-                    brFormat.format(totalVotos),
-                    brFormat.format(votosNominais),
-                    brFormat.format(votosLegenda));
-                }
-            }
-            else if(numEleitos == 1){
-                System.out.printf("%d - %s - %d, %s votos (%s nominais e %s de legenda), 1 candidato eleito\n",
-                    posicao++,
-                    partido.getSigla(),
-                    partido.getNumero(),
-                    brFormat.format(totalVotos),
-                    brFormat.format(votosNominais),
-                    brFormat.format(votosLegenda));
-            }
-            else{
-                System.out.printf("%d - %s - %d, %s votos (%s nominais e %s de legenda), %d candidatos eleitos\n",
-                        posicao++,
-                        partido.getSigla(),
-                        partido.getNumero(),
-                        brFormat.format(totalVotos),
-                        brFormat.format(votosNominais),
-                        brFormat.format(votosLegenda),
-                        numEleitos);
-            }
+            String votoStr = (totalVotos <= 1) ? "voto" : "votos";
+			String votoNominalStr = (votosNominais <= 1) ? "nominal" : "nominais";
+			String candidatoStr = (numEleitos <= 1) ? "candidato eleito" : "candidatos eleitos";
+
+			if (totalVotos == 0) {
+				System.out.printf("%d - %s - %d, 0 voto (0 %s e 0 de legenda), 0 candidato eleito\n",
+					posicao++,
+					partido.getSigla(),
+					partido.getNumero(),
+					votoNominalStr);
+			} else {
+				System.out.printf("%d - %s - %d, %s %s (%s %s e %s de legenda), %d %s\n",
+					posicao++,
+					partido.getSigla(),
+					partido.getNumero(),
+					brFormat.format(totalVotos),
+					votoStr,
+					brFormat.format(votosNominais),
+					votoNominalStr,
+					brFormat.format(votosLegenda),
+					numEleitos,
+					candidatoStr);
+			}
         }
     }
 

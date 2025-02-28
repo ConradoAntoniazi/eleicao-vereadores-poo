@@ -9,12 +9,8 @@ public class App {
         String pathVotacao = args[2];
         Eleicao eleicao = new Eleicao(Integer.parseInt(args[0]), args[3]);
 
-        eleicao.processarCandidatosPartidos("../in/" + pathCandidatos);
-        eleicao.processarVotos("../in/" + pathVotacao);
-
-        //eleicao.imprimirPartidos();
-        //System.out.println("");
-        //eleicao.imprimirCandidatos();
+        eleicao.processarCandidatosPartidos(pathCandidatos);
+        eleicao.processarVotos(pathVotacao);
         eleicao.gerarRelatorios();
     }
 }
