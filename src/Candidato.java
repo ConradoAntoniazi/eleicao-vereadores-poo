@@ -33,8 +33,8 @@ public class Candidato {
         return this.numero;
     }
 
-    public String getNomeUrna() {
-        if (this.partido.getNumeroFederacao() == -1)
+    public String getNomeUrna(int flagFederado) {
+        if (this.partido.getNumeroFederacao() == -1 || flagFederado == 0)
             return nomeUrna;
         return "*" + this.nomeUrna;
     }
@@ -61,9 +61,9 @@ public class Candidato {
     }
 
     public boolean isEleito() {
-        return this.situacaoEleitoral == SituacaoEleitoral.ELEITO ||
+        return (this.situacaoEleitoral == SituacaoEleitoral.ELEITO ||
                 this.situacaoEleitoral == SituacaoEleitoral.ELEITO_POR_QUOCIENTE_PARTIDARIO ||
-                this.situacaoEleitoral == SituacaoEleitoral.ELEITO_POR_MEDIA;
+                this.situacaoEleitoral == SituacaoEleitoral.ELEITO_POR_MEDIA);
     }
 
     public int getIdade(String dataEleicaoStr) {

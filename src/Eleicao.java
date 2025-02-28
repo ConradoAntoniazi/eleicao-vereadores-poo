@@ -42,9 +42,15 @@ public class Eleicao {
                     int codigoCargo = Integer.parseInt(campos[13].trim().replace("\"", ""));
                     int codigoMunicipio = Integer.parseInt(campos[11].trim().replace("\"", ""));
                     int situacaoTurno = Integer.parseInt(campos[48].trim().replace("\"", ""));
-                    if (codigoCargo != 13 || codigoMunicipio != this.codigoCidade || situacaoTurno == -1)
+                    if (codigoCargo != 13 || codigoMunicipio != this.codigoCidade || situacaoTurno == -1) { 
+                        int numPartido = Integer.parseInt(campos[25].trim().replace("\"", "")); // Necessário fazer isso para ler TODOS os partidos, não so aqueles que possuem vereador em situação boa
+                        int numeroFederacao = Integer.parseInt(campos[28].trim().replace("\"", ""));
+                        if (!this.partidos.containsKey(numPartido)) { // partido não está presente no hashMap, então é criado.
+                            this.partidos.put(numPartido, new Partido(Integer.parseInt(campos[25]),
+                                    campos[26].trim().replace("\"", ""), campos[27].trim().replace("\"", ""), numeroFederacao));
+                        }
                         continue; // Se não for vereador, não for a cidade que estamos avaliando ou a candidatura
-                                  // for inválida, pula.
+                    }
                 } catch (NumberFormatException e) {
                     System.err.println("Erro ao converter número: " + e.getMessage());
                     return;
@@ -68,9 +74,10 @@ public class Eleicao {
                 Candidato candAux = new Candidato(numero, nomeUrna, partAux, dataNascimento, genero, situacao);
 
                 // Incrementa o número de eleitos da eleição
-                if (candAux.isEleito())
+                if (candAux.isEleito()){
                     this.numEleitos++;
-                this.candidatosEleitos.add(candAux);
+                    this.candidatosEleitos.add(candAux);
+                }
 
                 this.candidatos.put(numero, candAux);
                 partAux.addCandidato(candAux);
@@ -149,7 +156,7 @@ public class Eleicao {
         System.out.println("Vereadores eleitos:");
         for (Candidato candidatoEleito : candidatosEleitos) {
             i++;
-            System.out.println(String.format("%d - %s (%s, %s votos)", i, candidatoEleito.getNomeUrna(),
+            System.out.println(String.format("%d - %s (%s, %s votos)", i, candidatoEleito.getNomeUrna(1),
                     candidatoEleito.getPartido().getSigla(), brFormat.format(candidatoEleito.getVotos())));
         }
     }
@@ -172,7 +179,7 @@ public class Eleicao {
         for (Candidato candidato : candidatosMaisVotados) {
             i++;
             if (i <= this.numEleitos)
-                System.out.println(String.format("%d - %s (%s, %s votos)", i, candidato.getNomeUrna(),
+                System.out.println(String.format("%d - %s (%s, %s votos)", i, candidato.getNomeUrna(1),
                         candidato.getPartido().getSigla(), brFormat.format(candidato.getVotos())));
 
             // Se o candidato não foi eleito e está entre os mais votados, ele teria sido
@@ -188,17 +195,17 @@ public class Eleicao {
             }
         }
 
-        System.out.println("\nTeriam sido eleitos se a votação fosse majoritária, e não foram eleitos:");
+        System.out.println("\nTeriam sido eleitos se a votação fosse majoritária, e não foram eleitos:\n(com sua posição no ranking de mais votados)");
         for (Candidato candidatoNaoEleito : candidatosSeriamEleitos) {
             System.out.println(String.format("%d - %s (%s, %s votos)",
-                    candidatosMaisVotados.indexOf(candidatoNaoEleito) + 1, candidatoNaoEleito.getNomeUrna(),
+                    candidatosMaisVotados.indexOf(candidatoNaoEleito) + 1, candidatoNaoEleito.getNomeUrna(1),
                     candidatoNaoEleito.getPartido().getSigla(), brFormat.format(candidatoNaoEleito.getVotos())));
         }
 
-        System.out.println("\nEleitos, que se beneficiaram do sistema proporcional:");
+        System.out.println("\nEleitos, que se beneficiaram do sistema proporcional:\n(com sua posição no ranking de mais votados)");
         for (Candidato candidatoBeneficiado : candidatosEleitosPorProporcionalidade) {
             System.out.println(String.format("%d - %s (%s, %s votos)",
-                    candidatosMaisVotados.indexOf(candidatoBeneficiado) + 1, candidatoBeneficiado.getNomeUrna(),
+                    candidatosMaisVotados.indexOf(candidatoBeneficiado) + 1, candidatoBeneficiado.getNomeUrna(1),
                     candidatoBeneficiado.getPartido().getSigla(), brFormat.format(candidatoBeneficiado.getVotos())));
         }
     }
@@ -225,15 +232,43 @@ public class Eleicao {
             int votosLegenda = partido.getVotosLegenda();
             int totalVotos = partido.getTotalVotos();
             int numEleitos = partido.getNumEleitos();
-
-            System.out.printf("%d - %s - %d, %s votos (%s nominais e %s de legenda), %d candidato(s) eleito(s)%n",
+           
+            if(numEleitos == 0){
+                if(totalVotos == 0){
+                    System.out.printf("%d - %s - %d, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito\n",
+                    posicao++,
+                    partido.getSigla(),
+                    partido.getNumero());
+                }
+                else{
+                    System.out.printf("%d - %s - %d, %s votos (%s nominais e %s de legenda), 0 candidato eleito\n",
                     posicao++,
                     partido.getSigla(),
                     partido.getNumero(),
                     brFormat.format(totalVotos),
                     brFormat.format(votosNominais),
-                    brFormat.format(votosLegenda),
-                    numEleitos);
+                    brFormat.format(votosLegenda));
+                }
+            }
+            else if(numEleitos == 1){
+                System.out.printf("%d - %s - %d, %s votos (%s nominais e %s de legenda), 1 candidato eleito\n",
+                    posicao++,
+                    partido.getSigla(),
+                    partido.getNumero(),
+                    brFormat.format(totalVotos),
+                    brFormat.format(votosNominais),
+                    brFormat.format(votosLegenda));
+            }
+            else{
+                System.out.printf("%d - %s - %d, %s votos (%s nominais e %s de legenda), %d candidatos eleitos\n",
+                        posicao++,
+                        partido.getSigla(),
+                        partido.getNumero(),
+                        brFormat.format(totalVotos),
+                        brFormat.format(votosNominais),
+                        brFormat.format(votosLegenda),
+                        numEleitos);
+            }
         }
     }
 
@@ -276,10 +311,10 @@ public class Eleicao {
                     posicao++,
                     partido.getSigla(),
                     partido.getNumero(),
-                    primeiro.getNomeUrna(),
+                    primeiro.getNomeUrna(0),
                     primeiro.getNumero(),
                     brFormat.format(primeiro.getVotos()),
-                    ultimo.getNomeUrna(),
+                    ultimo.getNomeUrna(0),
                     ultimo.getNumero(),
                     brFormat.format(ultimo.getVotos()));
         }
