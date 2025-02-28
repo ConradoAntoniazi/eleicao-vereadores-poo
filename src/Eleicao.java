@@ -2,22 +2,18 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.text.*;
-import java.time.*;
-import java.time.format.*;
 
 public class Eleicao {
-    private int codigoCidade;
-    private String data;
-    private int numEleitos;
-    private HashMap<Integer, Candidato> candidatos;
-    private HashMap<Integer, Partido> partidos;
+    private final int codigoCidade;
+    private final String data;
+    private int numEleitos = 0;
+    private HashMap<Integer, Candidato> candidatos = new HashMap<>();;
+    private HashMap<Integer, Partido> partidos = new HashMap<>();;
     private ArrayList<Candidato> candidatosEleitos = new ArrayList<>();
 
     public Eleicao(int codigo, String data) {
         this.codigoCidade = codigo;
         this.data = data;
-        this.candidatos = new HashMap<>();
-        this.partidos = new HashMap<>();
     }
 
     public int getCodigo() {
@@ -74,11 +70,11 @@ public class Eleicao {
                 // Incrementa o número de eleitos da eleição
                 if (candAux.isEleito())
                     this.numEleitos++;
-                    this.candidatosEleitos.add(candAux);
+                this.candidatosEleitos.add(candAux);
 
                 this.candidatos.put(numero, candAux);
                 partAux.addCandidato(candAux);
-                
+
             }
 
         } catch (IOException e) {
@@ -138,7 +134,6 @@ public class Eleicao {
 
     private void geraRelatorioVereadoresEleitos() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
-        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         ArrayList<Candidato> candidatosEleitos = new ArrayList<Candidato>();
 
         for (Candidato candidato : this.candidatos.values()) {
@@ -146,8 +141,9 @@ public class Eleicao {
                 candidatosEleitos.add(candidato);
         }
 
-        candidatosEleitos.sort(Comparator.comparingInt(Candidato::getVotos).reversed()
-                .thenComparing(candidato -> LocalDate.parse(candidato.getDataNascimento(), formatDate)));
+        candidatosEleitos.sort(Comparator
+                .comparingInt(Candidato::getVotos).reversed()
+                .thenComparing(Candidato::getDataNascimento));
 
         int i = 0;
         System.out.println("Vereadores eleitos:");
@@ -160,12 +156,13 @@ public class Eleicao {
 
     private void geraRelatoriosSobreMaisVotados() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
-        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         List<Candidato> candidatosMaisVotados = new ArrayList<>(candidatos.values());
 
         // Ordena o array de candidatos
-        candidatosMaisVotados.sort(Comparator.comparingInt(Candidato::getVotos).reversed()
-                .thenComparing(candidato -> LocalDate.parse(candidato.getDataNascimento(), formatDate)));
+        candidatosMaisVotados.sort(Comparator
+                .comparingInt(Candidato::getVotos).reversed()
+                .thenComparing(Candidato::getDataNascimento)
+        );
 
         List<Candidato> candidatosSeriamEleitos = new ArrayList<>();
         List<Candidato> candidatosEleitosPorProporcionalidade = new ArrayList<>();
@@ -220,7 +217,7 @@ public class Eleicao {
                 return Integer.compare(p1.getNumero(), p2.getNumero());
         });
 
-        //cabecalho
+        // cabecalho
         System.out.println("\nVotação dos partidos e número de candidatos eleitos:");
 
         int posicao = 1;
@@ -243,7 +240,6 @@ public class Eleicao {
 
     private void geraRelatorioPrimeiroUltimoPartido() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
-        DateTimeFormatter formDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         // Filtrar partidos com candidatos válidos (votos > 0)
         List<Partido> partidosValidos = new ArrayList<>(this.partidos.values());
@@ -267,7 +263,7 @@ public class Eleicao {
         for (Partido partido : partidosValidos) {
             Comparator<Candidato> comparator = Comparator
                     .comparingInt(Candidato::getVotos).reversed()
-                    .thenComparing(c -> LocalDate.parse(c.getDataNascimento(), formDate));
+                    .thenComparing(c -> c.getDataNascimento());
 
             List<Candidato> candidatosOrdenados = partido.getCandidatosValidos().stream()
                     .sorted(comparator)
@@ -290,67 +286,76 @@ public class Eleicao {
 
     private void geraRelatorioFaixaEtaria() {
         int[] faixas = new int[5]; // [<30, 30-39, 40-49, 50-59, >=60]
-        
+
         for (Candidato candidato : this.candidatosEleitos) {
             int idade = candidato.getIdade(this.data);
-            
-            if (idade < 30) faixas[0]++;
-            else if (idade < 40) faixas[1]++;
-            else if (idade < 50) faixas[2]++;
-            else if (idade < 60) faixas[3]++;
-            else faixas[4]++;
+
+            if (idade < 30)
+                faixas[0]++;
+            else if (idade < 40)
+                faixas[1]++;
+            else if (idade < 50)
+                faixas[2]++;
+            else if (idade < 60)
+                faixas[3]++;
+            else
+                faixas[4]++;
         }
-    
+
         int total = this.numEleitos;
         NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.forLanguageTag("pt-BR"));
         percentFormat.setMinimumFractionDigits(2);
-    
+
         System.out.println("\nEleitos, por faixa etária (na data da eleição):");
-        System.out.printf("    Idade < 30: %d (%s)%n", faixas[0], percentFormat.format((double) faixas[0]/total));
-        System.out.printf("30 <= Idade < 40: %d (%s)%n", faixas[1], percentFormat.format((double) faixas[1]/total));
-        System.out.printf("40 <= Idade < 50: %d (%s)%n", faixas[2], percentFormat.format((double) faixas[2]/total));
-        System.out.printf("50 <= Idade < 60: %d (%s)%n", faixas[3], percentFormat.format((double) faixas[3]/total));
-        System.out.printf("60 <= Idade    : %d (%s)%n", faixas[4], percentFormat.format((double) faixas[4]/total));
+        System.out.printf("    Idade < 30: %d (%s)%n", faixas[0], percentFormat.format((double) faixas[0] / total));
+        System.out.printf("30 <= Idade < 40: %d (%s)%n", faixas[1], percentFormat.format((double) faixas[1] / total));
+        System.out.printf("40 <= Idade < 50: %d (%s)%n", faixas[2], percentFormat.format((double) faixas[2] / total));
+        System.out.printf("50 <= Idade < 60: %d (%s)%n", faixas[3], percentFormat.format((double) faixas[3] / total));
+        System.out.printf("60 <= Idade    : %d (%s)%n", faixas[4], percentFormat.format((double) faixas[4] / total));
     }
 
     private void geraRelatorioGenero() {
         int feminino = 0;
         int masculino = 0;
-        
+
         for (Candidato candidato : this.candidatosEleitos) {
             Genero genero = candidato.getGenero();
-            if (genero == Genero.FEMININO) feminino++;
-            else if (genero == Genero.MASCULINO) masculino++;
+            if (genero == Genero.FEMININO)
+                feminino++;
+            else if (genero == Genero.MASCULINO)
+                masculino++;
         }
-    
+
         int total = this.numEleitos;
         NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.forLanguageTag("pt-BR"));
         percentFormat.setMinimumFractionDigits(2);
-    
+
         System.out.println("\nEleitos, por gênero:");
-        System.out.printf("Feminino: %d (%s)%n", feminino, (total == 0) ? "0,00%" : percentFormat.format((double) feminino / total));
-        System.out.printf("Masculino: %d (%s)%n", masculino, (total == 0) ? "0,00%" : percentFormat.format((double) masculino / total));
+        System.out.printf("Feminino: %d (%s)%n", feminino,
+                (total == 0) ? "0,00%" : percentFormat.format((double) feminino / total));
+        System.out.printf("Masculino: %d (%s)%n", masculino,
+                (total == 0) ? "0,00%" : percentFormat.format((double) masculino / total));
     }
 
     private void geraRelatorioTotalVotos() {
         // Somatorio dos nominais
         int votosNominais = this.candidatos.values().stream().mapToInt(Candidato::getVotos).sum();
-    
+
         // Somatorio dos nominais
         int votosLegenda = this.partidos.values().stream().mapToInt(Partido::getVotosLegenda).sum();
-    
+
         int totalVotosValidos = votosNominais + votosLegenda;
-    
+
         // Formatando números e porcentagens
         NumberFormat numFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
         NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.forLanguageTag("pt-BR"));
         percentFormat.setMinimumFractionDigits(2);
-    
+
         System.out.println("\nTotal de votos válidos:    " + numFormat.format(totalVotosValidos));
-        System.out.println("Total de votos nominais:    " + numFormat.format(votosNominais) + 
-            " (" + percentFormat.format((double) votosNominais / totalVotosValidos) + ")");
-        System.out.println("Total de votos de legenda: " + numFormat.format(votosLegenda) + 
-            " (" + percentFormat.format((double) votosLegenda / totalVotosValidos) + ")");
+        System.out.println("Total de votos nominais:    " + numFormat.format(votosNominais) +
+                " (" + percentFormat.format((double) votosNominais / totalVotosValidos) + ")");
+        System.out.println("Total de votos de legenda: " + numFormat.format(votosLegenda) +
+                " (" + percentFormat.format((double) votosLegenda / totalVotosValidos) + ")");
     }
 
     public void gerarRelatorios() {

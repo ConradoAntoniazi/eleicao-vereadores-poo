@@ -1,21 +1,30 @@
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Candidato {
-    private int numero;
-    private String nomeUrna;
-    private Partido partido;
-    private int votos;
-    private String dataNascimento;
-    private Genero genero;
-    private SituacaoEleitoral situacaoEleitoral;
+    private final int numero;
+    private final String nomeUrna;
+    private final Partido partido;
+    private int votos = 0;
+    private final LocalDate dataNascimento;
+    private final Genero genero;
+    private final SituacaoEleitoral situacaoEleitoral;
 
     public Candidato(int numero, String nome, Partido partido, String dataNasc, int genero, int situacao) {
+        if (partido == null) throw new IllegalArgumentException("Partido não pode ser nulo");
+        
         this.numero = numero;
         this.nomeUrna = nome;
         this.partido = partido;
-        this.dataNascimento = dataNasc;
+        
+        try {
+            this.dataNascimento = LocalDate.parse(dataNasc, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Data de nascimento inválida: " + dataNasc);
+        }
+        
         this.genero = Genero.fromCodigo(genero);
         this.situacaoEleitoral = SituacaoEleitoral.fromCodigo(situacao);
     }
@@ -39,6 +48,7 @@ public class Candidato {
     }
 
     public void addVotos(int votos) {
+        if (votos < 0) throw new IllegalArgumentException("Votos não podem ser negativos");
         this.votos += votos;
     }
 
@@ -46,7 +56,7 @@ public class Candidato {
         return this.genero;
     }
 
-    public String getDataNascimento() {
+    public LocalDate getDataNascimento() {
         return this.dataNascimento;
     }
 
@@ -58,9 +68,8 @@ public class Candidato {
 
     public int getIdade(String dataEleicaoStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dataNasc = LocalDate.parse(this.dataNascimento, formatter);
         LocalDate dataEleicao = LocalDate.parse(dataEleicaoStr, formatter);
-        return Period.between(dataNasc, dataEleicao).getYears();
+        return Period.between(this.dataNascimento, dataEleicao).getYears();
     }
 
     @Override

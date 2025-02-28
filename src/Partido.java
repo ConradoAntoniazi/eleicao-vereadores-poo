@@ -1,24 +1,21 @@
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Partido {
-    private int numero;
-    private String sigla;
-    private String nome;
-    private int numeroFederacao;
-    private int votosLegenda;
-    private LinkedList<Candidato> candidatos;
+    private final int numero;
+    private final String sigla;
+    private final String nome;
+    private final int numeroFederacao;
+    private int votosLegenda = 0;
+    private LinkedList<Candidato> candidatos = new LinkedList<>();
 
     public Partido(int numero, String sigla, String nome, int numeroFed) {
         this.numero = numero;
         this.sigla = sigla;
         this.nome = nome;
         this.numeroFederacao = numeroFed;
-        this.candidatos = new LinkedList<>();
     }
 
     public int getNumero() {
@@ -49,10 +46,6 @@ public class Partido {
         return candidatos;
     }
 
-    public Candidato getCandidato(int numCandidato) {
-        return this.candidatos.get(numCandidato);
-    }
-
     public void addCandidato(Candidato candidato) {
         this.candidatos.add(candidato);
     }
@@ -77,15 +70,14 @@ public class Partido {
 
     public Candidato getCandidatoMaisVotado() {
         List<Candidato> validos = getCandidatosValidos();
-        if (validos.isEmpty()) return null;
-        
-        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        if (validos.isEmpty())
+            return null;
 
         validos.sort(Comparator
-            .comparingInt(Candidato::getVotos).reversed().
-            thenComparing((Candidato c) -> LocalDate.parse(c.getDataNascimento(), formatDate))
+                .comparingInt(Candidato::getVotos).reversed()
+                .thenComparing(Candidato::getDataNascimento)
         );
-        
+
         return validos.get(0);
     }
 
