@@ -264,7 +264,8 @@ public class Eleicao {
 
         // Filtrando partidos com candidatos validos
         List<Partido> partidosValidos = new ArrayList<>(this.partidos.values());
-        partidosValidos.removeIf(p -> p.getCandidatosValidos().isEmpty());
+        //ignorando partidos sem candidatos
+        partidosValidos.removeIf(p -> p.getCandidatos().isEmpty());
 
         // Ordenando partidos pelo candidato mais votado (decrescente)
         // e número do partido (crescente)
@@ -286,7 +287,7 @@ public class Eleicao {
                     .comparingInt(Candidato::getVotos).reversed()
                     .thenComparing(Candidato::getDataNascimento);
 
-            List<Candidato> candidatosOrdenados = partido.getCandidatosValidos()
+            List<Candidato> candidatosOrdenados = partido.getCandidatos()
                     .stream()
                     .sorted(comparator)
                     .collect(Collectors.toList());
