@@ -3,6 +3,39 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.text.*;
 
+/**
+ * Classe responsável por representar uma eleição municipal, com foco na
+ * apuração de votos
+ * para o cargo de vereador.
+ * 
+ * <p>
+ * Esta classe:
+ * <ul>
+ * <li>Armazena dados de candidatos e partidos</li>
+ * <li>Processa arquivos de entrada no formato CSV</li>
+ * <li>Gera relatórios eleitorais conforme especificações</li>
+ * </ul>
+ * 
+ * <p>
+ * Atributos principais:
+ * <ul>
+ * <li>{@code codigoCidade}: Código TSE do município onde ocorre a eleição</li>
+ * <li>{@code data}: Data da eleição no formato dd/MM/yyyy</li>
+ * <li>{@code numEleitos}: Número total de vagas para vereador</li>
+ * <li>{@code candidatos}: Mapeamento de número de candidato para instância de
+ * {@link Candidato}</li>
+ * <li>{@code partidos}: Mapeamento de número de partido para instância de
+ * {@link Partido}</li>
+ * <li>{@code candidatosEleitos}: Lista de candidatos eleitos, ordenada por
+ * votos</li>
+ * </ul>
+ * 
+ * @see Candidato
+ * @see Partido
+ * @see #processarCandidatosPartidos(String)
+ * @see #processarVotos(String)
+ * @see #gerarRelatorios()
+ */
 public class Eleicao {
     private final int codigoCidade;
     private final String data;
