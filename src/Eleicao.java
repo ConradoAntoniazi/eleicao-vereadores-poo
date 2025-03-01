@@ -11,19 +11,52 @@ public class Eleicao {
     private HashMap<Integer, Partido> partidos = new HashMap<>();;
     private ArrayList<Candidato> candidatosEleitos = new ArrayList<>();
 
+    /**
+     * Construtor de eleicao.
+     * 
+     * @param codigo o codigo da cidade onde ocorreu a eleicao
+     * @param data   data em que ocorreu a eleicao
+     */
     public Eleicao(int codigo, String data) {
         this.codigoCidade = codigo;
         this.data = data;
     }
 
+    /**
+     * obtem o codigo da cidade onde ocorreu a eleicao
+     * 
+     * @return codigo de cidade da eleicao
+     */
     public int getCodigo() {
         return this.codigoCidade;
     }
 
+    /**
+     * obtem a data em que ocorreu a eleicao
+     * 
+     * @return a data da eleicao
+     */
     public String getData() {
         return this.data;
     }
 
+    /**
+     * Processa o arquivo de candidatos e partidos, carregando os dados na estrutura
+     * da aplicação.
+     * 
+     * @param caminhoArquivo Caminho do arquivo CSV contendo os dados de candidatos
+     *                       e partidos
+     * @implNote O método:
+     *           - Ignora a primeira linha do arquivo (cabeçalho)
+     *           - Filtra candidatos do cargo 13 (vereador) para o município
+     *           especificado
+     *           - Cria instâncias de Partido e Candidato
+     *           - Armazena candidatos eleitos em lista específica
+     *           - Relaciona candidatos com seus respectivos partidos
+     * @throws NumberFormatException Se ocorrer erro na conversão de valores
+     *                               numéricos
+     * @throws IOException           Se ocorrer erro na leitura do arquivo
+     */
     public void processarCandidatosPartidos(String caminhoArquivo) {
         try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(new FileInputStream(caminhoArquivo), "ISO-8859-1"))) {
@@ -42,12 +75,19 @@ public class Eleicao {
                     int codigoCargo = Integer.parseInt(campos[13].trim().replace("\"", ""));
                     int codigoMunicipio = Integer.parseInt(campos[11].trim().replace("\"", ""));
                     int situacaoTurno = Integer.parseInt(campos[48].trim().replace("\"", ""));
-                    if (codigoCargo != 13 || codigoMunicipio != this.codigoCidade || situacaoTurno == -1) { 
-                        int numPartido = Integer.parseInt(campos[25].trim().replace("\"", "")); // Necessário fazer isso para ler TODOS os partidos, não so aqueles que possuem vereador em situação boa
+                    if (codigoCargo != 13 || codigoMunicipio != this.codigoCidade || situacaoTurno == -1) {
+                        int numPartido = Integer.parseInt(campos[25].trim().replace("\"", "")); // Necessário fazer isso
+                                                                                                // para ler TODOS os
+                                                                                                // partidos, não so
+                                                                                                // aqueles que possuem
+                                                                                                // vereador em situação
+                                                                                                // boa
                         int numeroFederacao = Integer.parseInt(campos[28].trim().replace("\"", ""));
-                        if (!this.partidos.containsKey(numPartido)) { // partido não está presente no hashMap, então é criado.
+                        if (!this.partidos.containsKey(numPartido)) { // partido não está presente no hashMap, então é
+                                                                      // criado.
                             this.partidos.put(numPartido, new Partido(Integer.parseInt(campos[25]),
-                                    campos[26].trim().replace("\"", ""), campos[27].trim().replace("\"", ""), numeroFederacao));
+                                    campos[26].trim().replace("\"", ""), campos[27].trim().replace("\"", ""),
+                                    numeroFederacao));
                         }
                         continue; // Se não for vereador, não for a cidade que estamos avaliando ou a candidatura
                     }
@@ -74,7 +114,7 @@ public class Eleicao {
                 Candidato candAux = new Candidato(numero, nomeUrna, partAux, dataNascimento, genero, situacao);
 
                 // Incrementa o número de eleitos da eleição
-                if (candAux.isEleito()){
+                if (candAux.isEleito()) {
                     this.numEleitos++;
                     this.candidatosEleitos.add(candAux);
                 }
@@ -89,6 +129,21 @@ public class Eleicao {
         }
     }
 
+    /**
+     * Processa o arquivo de votação, acumulando os votos para candidatos e
+     * partidos.
+     * 
+     * @param caminhoArquivo Caminho do arquivo CSV contendo os dados de votação
+     * @implNote O método:
+     *           - Ignora a primeira linha do arquivo (cabeçalho)
+     *           - Considera apenas votos para o cargo 13 (vereador) no município
+     *           especificado
+     *           - Ignora votos para coligações (95 a 98)
+     *           - Distribui votos entre candidatos (nominais) e partidos (legenda)
+     * @throws NumberFormatException Se ocorrer erro na conversão de valores
+     *                               numéricos
+     * @throws IOException           Se ocorrer erro na leitura do arquivo
+     */
     public void processarVotos(String caminhoArquivo) {
         try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(new FileInputStream(caminhoArquivo), "ISO-8859-1"))) {
@@ -139,6 +194,16 @@ public class Eleicao {
         }
     }
 
+    /**
+     * Gera o relatório de vereadores eleitos ordenados por votos (decrescente) e
+     * idade (ascendente).
+     * 
+     * @implNote A saída inclui:
+     *           - Posição no ranking
+     *           - Nome de urna com asterisco para federados
+     *           - Sigla do partido
+     *           - Total de votos formatado
+     */
     private void geraRelatorioVereadoresEleitos() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
         ArrayList<Candidato> candidatosEleitos = new ArrayList<Candidato>();
@@ -161,6 +226,15 @@ public class Eleicao {
         }
     }
 
+    /**
+     * Gera três relatórios sobre os candidatos mais votados:
+     * 1. Candidatos mais votados dentro do número de vagas
+     * 2. Candidatos não eleitos que seriam eleitos no sistema majoritário
+     * 3. Candidatos eleitos que se beneficiaram do sistema proporcional
+     * 
+     * @implNote A ordenação é por votos (decrescente) e idade (ascendente)
+     * @implNote A saída mostra a posição original no ranking para os casos 2 e 3
+     */
     private void geraRelatoriosSobreMaisVotados() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
         List<Candidato> candidatosMaisVotados = new ArrayList<>(candidatos.values());
@@ -195,14 +269,16 @@ public class Eleicao {
             }
         }
 
-        System.out.println("\nTeriam sido eleitos se a votação fosse majoritária, e não foram eleitos:\n(com sua posição no ranking de mais votados)");
+        System.out.println(
+                "\nTeriam sido eleitos se a votação fosse majoritária, e não foram eleitos:\n(com sua posição no ranking de mais votados)");
         for (Candidato candidatoNaoEleito : candidatosSeriamEleitos) {
             System.out.println(String.format("%d - %s (%s, %s votos)",
                     candidatosMaisVotados.indexOf(candidatoNaoEleito) + 1, candidatoNaoEleito.getNomeUrna(1),
                     candidatoNaoEleito.getPartido().getSigla(), brFormat.format(candidatoNaoEleito.getVotos())));
         }
 
-        System.out.println("\nEleitos, que se beneficiaram do sistema proporcional:\n(com sua posição no ranking de mais votados)");
+        System.out.println(
+                "\nEleitos, que se beneficiaram do sistema proporcional:\n(com sua posição no ranking de mais votados)");
         for (Candidato candidatoBeneficiado : candidatosEleitosPorProporcionalidade) {
             System.out.println(String.format("%d - %s (%s, %s votos)",
                     candidatosMaisVotados.indexOf(candidatoBeneficiado) + 1, candidatoBeneficiado.getNomeUrna(1),
@@ -210,6 +286,17 @@ public class Eleicao {
         }
     }
 
+    /**
+     * Gera relatório de votação dos partidos ordenados por total de votos (nominais
+     * + legenda).
+     * 
+     * @implNote Critérios de ordenação:
+     *           1. Total de votos (decrescente)
+     *           2. Número do partido (ascendente)
+     * @implNote A saída inclui:
+     *           - Votos totais, nominais e de legenda
+     *           - Número de candidatos eleitos
+     */
     private void geraRelatorioVotacaoPartidos() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
 
@@ -232,90 +319,101 @@ public class Eleicao {
             int votosLegenda = partido.getVotosLegenda();
             int totalVotos = partido.getTotalVotos();
             int numEleitos = partido.getNumEleitos();
-           
-            String votoStr = (totalVotos <= 1) ? "voto" : "votos";
-			String votoNominalStr = (votosNominais <= 1) ? "nominal" : "nominais";
-			String candidatoStr = (numEleitos <= 1) ? "candidato eleito" : "candidatos eleitos";
 
-			if (totalVotos == 0) {
-				System.out.printf("%d - %s - %d, 0 voto (0 %s e 0 de legenda), 0 candidato eleito\n",
-					posicao++,
-					partido.getSigla(),
-					partido.getNumero(),
-					votoNominalStr);
-			} else {
-				System.out.printf("%d - %s - %d, %s %s (%s %s e %s de legenda), %d %s\n",
-					posicao++,
-					partido.getSigla(),
-					partido.getNumero(),
-					brFormat.format(totalVotos),
-					votoStr,
-					brFormat.format(votosNominais),
-					votoNominalStr,
-					brFormat.format(votosLegenda),
-					numEleitos,
-					candidatoStr);
-			}
+            String votoStr = (totalVotos <= 1) ? "voto" : "votos";
+            String votoNominalStr = (votosNominais <= 1) ? "nominal" : "nominais";
+            String candidatoStr = (numEleitos <= 1) ? "candidato eleito" : "candidatos eleitos";
+
+            if (totalVotos == 0) {
+                System.out.printf("%d - %s - %d, 0 voto (0 %s e 0 de legenda), 0 candidato eleito\n",
+                        posicao++,
+                        partido.getSigla(),
+                        partido.getNumero(),
+                        votoNominalStr);
+            } else {
+                System.out.printf("%d - %s - %d, %s %s (%s %s e %s de legenda), %d %s\n",
+                        posicao++,
+                        partido.getSigla(),
+                        partido.getNumero(),
+                        brFormat.format(totalVotos),
+                        votoStr,
+                        brFormat.format(votosNominais),
+                        votoNominalStr,
+                        brFormat.format(votosLegenda),
+                        numEleitos,
+                        candidatoStr);
+            }
         }
     }
 
+    /**
+     * Gera relatório com o primeiro e último colocados de cada partido com
+     * candidatos válidos.
+     * 
+     * @implNote Critérios:
+     *           - Partidos sem candidatos com votos válidos são ignorados
+     *           - Ordenação por votos do candidato mais votado (decrescente)
+     *           - Desempate por número do partido (ascendente)
+     *           - Primeiro/último determinados por votos e data de nascimento
+     *           - Partidos com um único candidato são ignorados
+     */
     private void geraRelatorioPrimeiroUltimoPartido() {
         NumberFormat brFormat = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
-    
+
         // Filtrando partidos com candidatos válidos
         List<Partido> partidosValidos = new ArrayList<>(this.partidos.values());
         // Ignorando partidos sem candidatos
         partidosValidos.removeIf(p -> p.getCandidatos().isEmpty());
-    
-        // Ordenando partidos pelo candidato mais votado (decrescente) e número do partido (crescente)
+
+        // Ordenando partidos pelo candidato mais votado (decrescente) e número do
+        // partido (crescente)
         partidosValidos.sort((p1, p2) -> {
             Candidato c1 = p1.getCandidatoMaisVotado();
             Candidato c2 = p2.getCandidatoMaisVotado();
-    
+
             // Verificar se os candidatos não são nulos antes de comparar os votos
             if (c1 == null || c2 == null) {
                 return c1 == null ? 1 : -1; // Mover partidos com candidatos nulos para o final
             }
-    
+
             int comparacaoVotos = Integer.compare(c2.getVotos(), c1.getVotos());
             if (comparacaoVotos != 0)
                 return comparacaoVotos;
             else
                 return Integer.compare(p1.getNumero(), p2.getNumero());
         });
-    
+
         System.out.println("\nPrimeiro e último colocados de cada partido:");
         int posicao = 1;
         for (Partido partido : partidosValidos) {
             // Ignora partidos com apenas um candidato
             if (partido.getCandidatos().size() == 1) {
-                continue; // Não imprime nada se o partido tiver apenas um candidato
+                continue;
             }
-    
+
             Comparator<Candidato> comparator = Comparator
                     .comparingInt(Candidato::getVotos).reversed()
                     .thenComparing(Candidato::getDataNascimento);
-    
+
             // Filtra candidatos nulos antes de ordenar
             List<Candidato> candidatosOrdenados = partido.getCandidatos()
                     .stream()
-                    .filter(Objects::nonNull) // Filtra candidatos nulos
+                    .filter(Objects::nonNull)
                     .sorted(comparator)
                     .collect(Collectors.toList());
-    
+
             // Verifica se a lista de candidatos não está vazia
             if (candidatosOrdenados.isEmpty()) {
                 System.out.println("Nenhum candidato disponível no partido " + partido.getSigla());
                 continue; // Pula para o próximo partido
             }
-    
+
             Candidato primeiro = candidatosOrdenados.get(0);
             Candidato ultimo = candidatosOrdenados.get(candidatosOrdenados.size() - 1);
-    
-            // Pluralização de "voto" ou "votos"
+
             String votoPrimeiro = (primeiro.getVotos() <= 1) ? "voto" : "votos";
             String votoUltimo = (ultimo.getVotos() <= 1) ? "voto" : "votos";
-    
+
             System.out.printf("%d - %s - %d, %s (%d, %s %s) / %s (%d, %s %s)%n",
                     posicao++,
                     partido.getSigla(),
@@ -327,11 +425,21 @@ public class Eleicao {
                     ultimo.getNomeUrna(0),
                     ultimo.getNumero(),
                     brFormat.format(ultimo.getVotos()),
-                    votoUltimo
-            );
+                    votoUltimo);
         }
-    }        
+    }
 
+    /**
+     * Gera relatório de distribuição de eleitos por faixa etária.
+     * 
+     * @implNote Faixas etárias:
+     *           - <30 anos
+     *           - 30-39 anos
+     *           - 40-49 anos
+     *           - 50-59 anos
+     *           - ≥60 anos
+     * @implNote Valores exibidos em quantidade absoluta e percentual formatado
+     */
     private void geraRelatorioFaixaEtaria() {
         int[] faixas = new int[5]; // [<30, 30-39, 40-49, 50-59, >=60]
 
@@ -365,6 +473,13 @@ public class Eleicao {
         System.out.printf("60 <= Idade    : %d (%s)%n", faixas[4], percentFormat.format((double) faixas[4] / total));
     }
 
+    /**
+     * Gera relatório de distribuição de eleitos por gênero.
+     * 
+     * @implNote Considera apenas os valores FEMININO e MASCULINO do enum Genero
+     * @implNote Exibe quantidade absoluta e percentual formatado
+     * @implNote Trata casos de divisão por zero quando não há eleitos
+     */
     private void geraRelatorioGenero() {
         int feminino = 0;
         int masculino = 0;
@@ -388,6 +503,15 @@ public class Eleicao {
                 (total == 0) ? "0,00%" : percentFormat.format((double) masculino / total));
     }
 
+    /**
+     * Gera relatório consolidado com totais de votos.
+     * 
+     * @implNote Exibe:
+     *           - Total de votos válidos (nominais + legenda)
+     *           - Votos nominais com percentual
+     *           - Votos de legenda com percentual
+     * @implNote Formata valores numéricos e percentuais de acordo com locale pt-BR
+     */
     private void geraRelatorioTotalVotos() {
         // Somatorio dos nominais
         int votosNominais = this.candidatos.values().stream().mapToInt(Candidato::getVotos).sum();
@@ -412,6 +536,33 @@ public class Eleicao {
                 " (" + percentFormat.format(percentLegenda) + ")");
     }
 
+    /**
+     * Método principal para geração de todos os relatórios da eleição em sequência
+     * pré-definida.
+     * 
+     * Ordem de execução dos relatórios:
+     * 
+     * Número de vagas
+     * Vereadores eleitos
+     * Candidatos mais votados
+     * Candidatos não eleitos eleitos no sistema majoritário
+     * Candidatos beneficiados pelo sistema proporcional
+     * Votação por partido
+     * Primeiro/último por partido
+     * Distribuição etária
+     * Distribuição por gênero
+     * Total de votos consolidado
+     * 
+     * @implNote Este método:
+     *           - Coordena o fluxo completo de geração de relatórios
+     *           - Formata e exibe os resultados em ordem específica
+     *           - Utiliza stdout como saída padrão
+     *           - Depende dos dados carregados por processarCandidatosPartidos() e
+     *           processarVotos()
+     * 
+     * @see #processarCandidatosPartidos(String)
+     * @see #processarVotos(String)
+     */
     public void gerarRelatorios() {
 
         System.out.println("Número de vagas: " + this.numEleitos + "\n"); // Relatório 1
