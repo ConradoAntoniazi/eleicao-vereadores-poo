@@ -3,7 +3,6 @@
 
 #include "Genero.hpp"
 #include "SituacaoEleitoral.hpp"
-#include "Partido.hpp"
 #include <string>
 #include <stdexcept>
 
@@ -24,8 +23,8 @@ private:
     static bool validarData(const string& data);
 
 public:
-    Candidato(int numero, const string& nomeUrna, Partido &partido, 
-              const string& dataNasc, int genero, int situacao);
+    Candidato(const int& numero, const string& nomeUrna, Partido &partido, 
+              const string& dataNasc, const int& genero, const int& situacao);
     
     // Getters
     int getNumero() const;

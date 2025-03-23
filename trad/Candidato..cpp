@@ -1,4 +1,5 @@
 #include "Candidato.hpp"
+#include "Partido.hpp"
 #include <sstream>
 #include <iomanip>
 
@@ -18,8 +19,8 @@ bool Candidato::validarData(const string &data)
     return true;
 }
 
-Candidato::Candidato(int numero, const string &nomeUrna, Partido &partido,
-                     const string &dataNasc, int genero, int situacao)
+Candidato::Candidato(const int& numero, const string& nomeUrna, Partido &partido,
+                     const string &dataNasc, const int& genero, const int& situacao)
     : numero(numero),
       nomeUrna(nomeUrna),
       partido(&partido),

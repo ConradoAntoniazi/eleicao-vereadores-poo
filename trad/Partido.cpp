@@ -1,17 +1,28 @@
 #include "Partido.hpp"
+#include "Candidato.hpp"
+#include <iterator>
+#include <algorithm>
 
-Partido::Partido(int numero, const string& sigla, const string& nome, int numeroFed)
+
+Partido::Partido(const int& numero, const string& sigla, const string& nome, const int& numeroFed)
     : numero(numero), sigla(sigla), nome(nome), numeroFederacao(numeroFed), votosLegenda(0) {}
 
 // Getters
 int Partido::getNumero() const { return numero; }
+
 string Partido::getSigla() const { return sigla; }
+
 string Partido::getNome() const { return nome; }
+
 int Partido::getNumeroFederacao() const { return numeroFederacao; }
+
 int Partido::getVotosLegenda() const { return votosLegenda; }
-const vector<Candidato*>& Partido::getCandidatos() const { return candidatos; }
+
+const list<Candidato*>& Partido::getCandidatos() const { return candidatos; }
+
 
 void Partido::addVotosLegenda(int votos) { votosLegenda += votos; }
+
 void Partido::addCandidato(Candidato* candidato) { candidatos.push_back(candidato); }
 
 int Partido::getVotosNominais() const {
@@ -31,8 +42,8 @@ int Partido::getNumEleitos() const {
         [](Candidato* c) { return c->isEleito(); });
 }
 
-vector<Candidato*> Partido::getCandidatosValidos() const {
-    vector<Candidato*> validos;
+list<Candidato*> Partido::getCandidatosValidos() const {
+    list<Candidato*> validos;
     copy_if(candidatos.begin(), candidatos.end(), back_inserter(validos),
         [](Candidato* c) { return c->getVotos() > 0; });
     return validos;
@@ -42,11 +53,15 @@ Candidato* Partido::getCandidatoMaisVotado() const {
     auto validos = getCandidatosValidos();
     if (validos.empty()) return nullptr;
     
-    sort(validos.begin(), validos.end(),
-        [](Candidato* a, Candidato* b) {
-            return a->getVotos() > b->getVotos() || 
-                  (a->getVotos() == b->getVotos() && a->getDataNascimento() < b->getDataNascimento());
-        });
+    // list tem sort nativo
+    validos.sort([](Candidato* a, Candidato* b) {
+        if (a->getVotos() != b->getVotos()) {
+            return a->getVotos() > b->getVotos(); // Decrescente
+        } else {
+            return a->getDataNascimento() < b->getDataNascimento(); // Crescente
+        }
+    });
+
     
     return validos.front();
 }

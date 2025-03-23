@@ -1,9 +1,9 @@
 #ifndef PARTIDO_HPP
 #define PARTIDO_HPP
 
-#include "Candidato.hpp"
 #include <vector>
-#include <algorithm>
+#include <list>
+#include <string>
 
 using namespace std;
 
@@ -16,9 +16,9 @@ private:
     string nome;
     int numeroFederacao;
     int votosLegenda;
-    vector<Candidato*> candidatos; 
+    list<Candidato*> candidatos; 
 public:
-    Partido(int numero, const string& sigla, const string& nome, int numeroFed);
+    Partido(const int& numero, const string& sigla, const string& nome, const int& numeroFed);
     
     // Getters
     int getNumero() const;
@@ -26,7 +26,7 @@ public:
     string getNome() const;
     int getNumeroFederacao() const;
     int getVotosLegenda() const;
-    const vector<Candidato*>& getCandidatos() const;
+    const list<Candidato*>& getCandidatos() const;
     
     void addVotosLegenda(int votos);
     void addCandidato(Candidato* candidato); 
@@ -34,7 +34,7 @@ public:
     int getTotalVotos() const;
     int getNumEleitos() const;
     
-    vector<Candidato*> getCandidatosValidos() const;
+    list<Candidato*> getCandidatosValidos() const;
     Candidato* getCandidatoMaisVotado() const;
 };
 
