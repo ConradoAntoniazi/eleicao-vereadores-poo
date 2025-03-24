@@ -22,7 +22,11 @@ using namespace std;
 #define COLUNA_GENERO_CANDIDATO 38
 #define COLUNA_SITUACAO_CANDIDATO 48
 
-#define MAIOR_IDX_COLUNA_OBSERVADO 48
+#define COLUNA_VOTACAO_CODIGO_CARGO 17
+#define COLUNA_VOTACAO_CODIGO_MUNICIPO 13
+#define COLUNA_VOTACAO_NUMERO_VOTAVEL 19
+#define COLUNA_VOTACAO_QTD_VOTOS 21
+
 
 void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
 {
@@ -55,37 +59,39 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
             while (getline(ss, campo, ';'))
             {
                 // Remover aspas e espaços em branco
-                campo.erase(remove(campo.begin(), campo.end(), '\"'), campo.end());
+                //campo.erase(remove(campo.begin(), campo.end(), '\"'), campo.end());
+                ProcessaEntrada::removeAspas(campo);
                 ProcessaEntrada::trim(campo);
                 campos.push_back(campo);
             }
 
-            if (campos.size() < (MAIOR_IDX_COLUNA_OBSERVADO + 1))
+            // Sempre colocar o maior idx de coluna observado aqui
+            if (campos.size() < (COLUNA_SITUACAO_CANDIDATO + 1))
             {
-                cerr << "Linha incompleta: " << linhaUtf8 << endl;
-                continue;
+                throw out_of_range("Linha com campos insuficientes");
+
             }
 
             try
             {
                 // Processar campos numéricos
-                int codigoCargo = stoi(campos[13]);
-                int codigoMunicipio = stoi(campos[11]);
-                int situacaoTurno = stoi(campos[48]);
+                int codigoCargo = stoi(campos[COLUNA_CODIGO_CARGO]);
+                int codigoMunicipio = stoi(campos[COLUNA_CODIGO_MUNICIPIO]);
+                int situacaoTurno = stoi(campos[COLUNA_SITUACAO_CANDIDATO]);
 
                 // Filtros iniciais
                 if (codigoCargo != 13 || codigoMunicipio != this->codigoCidade || situacaoTurno == -1)
                 {
-                    int numPartido = stoi(campos[25]);
-                    int numeroFederacao = stoi(campos[28]);
+                    int numPartido = stoi(campos[COLUNA_NUMERO_PARTIDO]);
+                    int numeroFederacao = stoi(campos[COLUNA_NUMERO_FEDERACAO]);
 
                     // Criar partido se não existir
                     if (partidos.find(numPartido) == partidos.end())
                     {
                         Partido *novoPartido = new Partido(
                             numPartido,
-                            campos[26],
-                            campos[27],
+                            campos[COLUNA_SIGLA_PARTIDO],
+                            campos[COLUNA_NOME_PARTIDO],
                             numeroFederacao);
                         partidos.emplace(numPartido, novoPartido);
                     }
@@ -93,8 +99,8 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
                 }
 
                 // Processar dados do partido
-                int numPartido = stoi(campos[25]);
-                int numeroFederacao = stoi(campos[28]);
+                int numPartido = stoi(campos[COLUNA_NUMERO_PARTIDO]);
+                int numeroFederacao = stoi(campos[COLUNA_NUMERO_FEDERACAO]);
 
                 // Criar/recuperar partido
                 auto itPartido = partidos.find(numPartido);
@@ -102,19 +108,19 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
                 {
                     Partido *novoPartido = new Partido(
                         numPartido,
-                        campos[26],
-                        campos[27],
+                        campos[COLUNA_SIGLA_PARTIDO],
+                        campos[COLUNA_NOME_PARTIDO],
                         numeroFederacao);
                     partidos.emplace(numPartido, novoPartido);
                     itPartido = partidos.find(numPartido);
                 }
 
                 // Processar dados do candidato
-                int numero = stoi(campos[16]);
-                string nomeUrna = campos[18];
-                string dataNascimento = campos[36];
-                int genero = stoi(campos[38]);
-                int situacao = stoi(campos[48]);
+                int numero = stoi(campos[COLUNA_NUMERO_CANDIDATO]);
+                string nomeUrna = campos[COLUNA_NOME_URNA_CANDIDATO];
+                string dataNascimento = campos[COLUNA_DATA_NASC_CANDIDATO];
+                int genero = stoi(campos[COLUNA_GENERO_CANDIDATO]);
+                int situacao = stoi(campos[COLUNA_SITUACAO_CANDIDATO]);
 
                 // Criar candidato
                 Candidato *candAux = new Candidato(
@@ -196,10 +202,10 @@ void Eleicao::processarVotos(const string &caminhoArquivo)
                     throw out_of_range("Linha com campos insuficientes");
                 }
 
-                int codigoCargo = stoi(campos[17]);     // CD_CARGO
-                int codigoMunicipio = stoi(campos[13]); // CD_MUNICIPIO
-                int numeroVotavel = stoi(campos[19]);   // NR_VOTAVEL
-                int quantidadeVotos = stoi(campos[21]); // QT_VOTOS
+                int codigoCargo = stoi(campos[COLUNA_VOTACAO_CODIGO_CARGO]);     // CD_CARGO
+                int codigoMunicipio = stoi(campos[COLUNA_VOTACAO_CODIGO_MUNICIPO]); // CD_MUNICIPIO
+                int numeroVotavel = stoi(campos[COLUNA_VOTACAO_NUMERO_VOTAVEL]);   // NR_VOTAVEL
+                int quantidadeVotos = stoi(campos[COLUNA_VOTACAO_QTD_VOTOS]); // QT_VOTOS
 
                 if (codigoCargo != 13 || codigoMunicipio != this->codigoCidade)
                 {
