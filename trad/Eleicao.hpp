@@ -16,14 +16,17 @@ private:
     const DataUtils data;
     int numEleitos;
 
-    std::vector<Candidato> candidatosEleitos;
-    std::map<int, Candidato> candidatos;
-    std::map<int, Partido> partidos;
-
-    //static void trim();
+    std::vector<Candidato*> candidatosEleitos;
+    std::map<int, Candidato*> candidatos;
+    std::map<int, Partido*> partidos;
 
 public:
     Eleicao(const int& condigo,const string& dataStr);
+
+    ~Eleicao() {
+        for (auto& pair : candidatos) delete pair.second;
+        for (auto& pair : partidos) delete pair.second;
+    }
 
     // getters na implementacao em java nao eram usados
     // entao serao ignorados aqui

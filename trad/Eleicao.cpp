@@ -8,7 +8,21 @@
 
 using namespace std;
 
+#define COLUNA_CODIGO_CARGO 13
+#define COLUNA_CODIGO_MUNICIPIO 11
+#define COLUNA_NUMERO_PARTIDO 25
 
+#define COLUNA_NUMERO_FEDERACAO 28
+#define COLUNA_NOME_PARTIDO 27
+#define COLUNA_SIGLA_PARTIDO 26
+
+#define COLUNA_NUMERO_CANDIDATO 16
+#define COLUNA_NOME_URNA_CANDIDATO 18
+#define COLUNA_DATA_NASC_CANDIDATO 36
+#define COLUNA_GENERO_CANDIDATO 38
+#define COLUNA_SITUACAO_CANDIDATO 48
+
+#define MAIOR_COLUNA_OBSERVADA 48
 
 void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
     try {
@@ -40,6 +54,11 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
                 campos.push_back(campo);
             }
 
+            if (campos.size() < (MAIOR_COLUNA_OBSERVADA + 1)) {
+                cerr << "Linha incompleta: " << linhaUtf8 << endl;
+                continue;
+            }
+
             try {
                 // Processar campos numéricos
                 int codigoCargo = stoi(campos[13]);
@@ -53,12 +72,13 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
 
                     // Criar partido se não existir
                     if (partidos.find(numPartido) == partidos.end()) {
-                        partidos.emplace(numPartido, Partido(
+                        Partido* novoPartido = new Partido(
                             numPartido,
                             campos[26],
                             campos[27],
                             numeroFederacao
-                        ));
+                        );
+                        partidos.emplace(numPartido, novoPartido);
                     }
                     continue;
                 }
@@ -70,12 +90,13 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
                 // Criar/recuperar partido
                 auto itPartido = partidos.find(numPartido);
                 if (itPartido == partidos.end()) {
-                    partidos.emplace(numPartido, Partido(
+                    Partido* novoPartido = new Partido(
                         numPartido,
                         campos[26],
                         campos[27],
                         numeroFederacao
-                    ));
+                    );
+                    partidos.emplace(numPartido, novoPartido);
                     itPartido = partidos.find(numPartido);
                 }
 
@@ -87,24 +108,25 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
                 int situacao = stoi(campos[48]);
 
                 // Criar candidato
-                Candidato candAux(
+                Candidato* candAux = new Candidato(
                     numero,
                     nomeUrna,
-                    itPartido->second,
+                    *(itPartido->second), // Passa a referência do partido
                     dataNascimento,
                     genero,
                     situacao
                 );
+                
 
                 // Verificar se foi eleito
-                if (candAux.isEleito()) {
+                if (candAux->isEleito()) {
                     numEleitos++;
                     candidatosEleitos.push_back(candAux);
                 }
 
                 // Adicionar aos containers
                 candidatos[numero] = candAux;
-                itPartido->second.addCandidato(&candAux);
+                itPartido->second->addCandidato(candAux);
 
             } catch (const invalid_argument& e) {
                 cerr << "Erro de conversão numérica: " << e.what() << endl;
@@ -120,3 +142,4 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
         cerr << "Erro durante o processamento: " << e.what() << endl;
     }
 }
+
