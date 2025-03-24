@@ -1,7 +1,10 @@
 #include "ProcessaEntrada.hpp"
+
 #include <locale>
 #include <cstdint>
 #include <algorithm>
+#include <sstream>
+#include <iomanip>
 
 string ProcessaEntrada::iso_8859_1_to_utf8(string &str)
 {
@@ -43,4 +46,18 @@ void ProcessaEntrada::trim(string &str)
 
 void ProcessaEntrada::removeAspas(string &str){
   str.erase(remove(str.begin(), str.end(), '\"'), str.end());
+}
+
+string ProcessaEntrada::formataNumero(const int& numero) {
+  stringstream ss;
+  ss.imbue(locale("pt_BR.UTF-8"));
+  ss << fixed << numero;
+  return ss.str();
+}
+
+string ProcessaEntrada::formataPercentual(const int& qtd, const int& total){
+  double percent = (total > 0) ? ((qtd * 100.0) / total) : 0.0;
+  stringstream ss;
+  ss << fixed << setprecision(2) << percent << "%";
+  return ss.str();
 }

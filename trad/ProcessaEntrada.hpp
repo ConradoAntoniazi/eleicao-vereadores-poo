@@ -11,6 +11,8 @@ public:
     static bool compare_pt_BR(const string &s1, const string &s2);
     static void trim(string &str);
     static void removeAspas(string &str);
+    static string formataNumero(const int& numero);
+    static string formataPercentual(const int& qtd, const int& total);
 };
 
 #endif // PROCESSA_ENTRADA_HPP
