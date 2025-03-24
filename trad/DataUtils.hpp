@@ -16,6 +16,7 @@ public:
     DataUtils(int d, int m, int a);
     
     static DataUtils fromString(const std::string& dataStr);
+    std::string toString() const;
     int calculaPeriodoEmAnos(const DataUtils& outraData) const;
 
     // Getters

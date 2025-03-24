@@ -13,7 +13,7 @@
 class Eleicao {
 private:
     const int codigoCidade;
-    const DataUtils data;
+    const string data;
     int numEleitos;
 
     std::vector<Candidato*> candidatosEleitos;

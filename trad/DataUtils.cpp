@@ -1,6 +1,7 @@
 #include "DataUtils.hpp"
 #include <sstream>
 #include <algorithm> // Para std::replace
+#include <iomanip>
 
 DataUtils::DataUtils(int d, int m, int a) : dia(d), mes(m), ano(a) {
     if (!ehDataValida(d, m, a)) {
@@ -39,6 +40,16 @@ DataUtils DataUtils::fromString(const std::string& dataStr) {
 
     return DataUtils(d, m, a);
 }
+
+std::string DataUtils::toString() const {
+    std::stringstream ss;
+    ss << std::setw(2) << std::setfill('0') << this->dia << "/"
+       << std::setw(2) << std::setfill('0') << this->mes << "/"
+       << this->ano;
+    
+    return ss.str();
+}
+
 
 int DataUtils::calculaPeriodoEmAnos(const DataUtils& outraData) const {
     int anos = outraData.ano - ano;
