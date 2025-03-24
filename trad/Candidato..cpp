@@ -1,31 +1,19 @@
-#include "Candidato.hpp"
-#include "Partido.hpp"
 #include <sstream>
 #include <iomanip>
 
+#include "Candidato.hpp"
+#include "Partido.hpp"
+
 using namespace std;
 
-bool Candidato::validarData(const string &data)
-{
-    istringstream ss(data);
-    int dia, mes, ano;
-    char delim1, delim2;
-
-    ss >> dia >> delim1 >> mes >> delim2 >> ano;
-    if (delim1 != '/' || delim2 != '/' || dia < 1 || dia > 31 || mes < 1 || mes > 12 || ano < 1900)
-    {
-        return false;
-    }
-    return true;
-}
-
 Candidato::Candidato(const int& numero, const string& nomeUrna, Partido &partido,
-                     const string &dataNasc, const int& genero, const int& situacao)
+                     const string &dataNascStr, const int& genero, const int& situacao)
     : numero(numero),
       nomeUrna(nomeUrna),
       partido(&partido),
       genero(Genero::fromCodigo(genero)), 
-      situacaoEleitoral(SituacaoEleitoral::fromCodigo(situacao))
+      situacaoEleitoral(SituacaoEleitoral::fromCodigo(situacao)),
+      dataNascimento(DataUtils::fromString(dataNascStr))
 {
 
     if (!(&partido))
@@ -33,12 +21,6 @@ Candidato::Candidato(const int& numero, const string& nomeUrna, Partido &partido
         throw invalid_argument("Partido não pode ser nulo");
     }
 
-    if (!validarData(dataNasc))
-    {
-        throw invalid_argument("Data de nascimento inválida: " + dataNasc);
-    }
-
-    this->dataNascimento = dataNasc; 
     this->votos = 0;
 }
 
@@ -57,13 +39,13 @@ string Candidato::getNomeUrna(int flagFederado) const
 Partido &Candidato::getPartido() const { return *partido; }
 int Candidato::getVotos() const { return votos; }
 Genero Candidato::getGenero() const { return genero; }
-string Candidato::getDataNascimento() const { return dataNascimento; }
+DataUtils Candidato::getDataNascimento() const { return dataNascimento; }
 
 bool Candidato::isEleito() const
 {
-    return situacaoEleitoral.getCodigo() == SituacaoEleitoral::ELEITO ||
+    return (situacaoEleitoral.getCodigo() == SituacaoEleitoral::ELEITO ||
            situacaoEleitoral.getCodigo() == SituacaoEleitoral::ELEITO_POR_QUOCIENTE_PARTIDARIO ||
-           situacaoEleitoral.getCodigo() == SituacaoEleitoral::ELEITO_POR_MEDIA;
+           situacaoEleitoral.getCodigo() == SituacaoEleitoral::ELEITO_POR_MEDIA);
 }
 
 void Candidato::addVotos(int votos)
@@ -77,7 +59,10 @@ void Candidato::addVotos(int votos)
 
 int Candidato::getIdade(const string &dataEleicaoStr) const
 {
-    // Implementação do cálculo de idade usando <chrono> , da std (simplificado)
-    // Nota: Requer parsing completo das datas
-    return 0;
+    DataUtils dataleicao = DataUtils::fromString(dataEleicaoStr);
+    int result = this->dataNascimento.calculaPeriodoEmAnos(dataleicao);
+    if(result < 0){
+        throw invalid_argument( "Idade obtida foi negativa. Data de eleicao ou de nascimento do candidato estao incorretas.");
+    }
+    return result;
 }

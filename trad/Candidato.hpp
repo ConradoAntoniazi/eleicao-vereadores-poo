@@ -3,6 +3,8 @@
 
 #include "Genero.hpp"
 #include "SituacaoEleitoral.hpp"
+#include "DataUtils.hpp"
+
 #include <string>
 #include <stdexcept>
 
@@ -16,11 +18,9 @@ private:
     int numero;
     string nomeUrna;
     Partido *partido;
-    string dataNascimento;
+    DataUtils dataNascimento;
     Genero genero;
     SituacaoEleitoral situacaoEleitoral;
-
-    static bool validarData(const string& data);
 
 public:
     Candidato(const int& numero, const string& nomeUrna, Partido &partido, 
@@ -32,7 +32,7 @@ public:
     Partido &getPartido() const;
     int getVotos() const;
     Genero getGenero() const;
-    string getDataNascimento() const;
+    DataUtils getDataNascimento() const;
     bool isEleito() const;
     int getIdade(const string& dataEleicaoStr) const;
     
