@@ -21,6 +21,12 @@ private:
     std::map<int, Partido*> partidos;
 
     void geraRelatorioVereadoresEleitos();
+    void geraRelatoriosSobreMaisVotados();
+    void geraRelatorioVotacaoPartidos(); 
+    void geraRelatorioPrimeiroUltimoPartido(); 
+    void geraRelatorioFaixaEtaria(); 
+    void geraRelatorioGenero(); 
+    void geraRelatorioTotalVotos();
 
 public:
     Eleicao(const int& condigo,const string& dataStr);

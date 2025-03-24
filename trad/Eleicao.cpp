@@ -286,3 +286,82 @@ void Eleicao::geraRelatorioVereadoresEleitos() {
     cout << "\n"; // Espaço entre relatórios
 }
 
+void Eleicao::geraRelatoriosSobreMaisVotados(){
+    // Relatório de mais votados e comparação entre sistemas
+    vector<Candidato*> candidatosMaisVotados;
+    
+    // Preenche com todos os candidatos
+    for (const auto& par : candidatos) {
+        candidatosMaisVotados.push_back(par.second);
+    }
+
+    // Ordena por votos (decrescente) e data nascimento (crescente)
+    sort(candidatosMaisVotados.begin(), candidatosMaisVotados.end(),
+        [](Candidato* a, Candidato* b) {
+            if (a->getVotos() != b->getVotos()) {
+                return a->getVotos() > b->getVotos();
+            }
+            return a->getDataNascimento() < b->getDataNascimento();
+        });
+
+    vector<Candidato*> candidatosSeriamEleitos;
+    vector<Candidato*> candidatosEleitosPorProporcionalidade;
+
+    cout << "\nCandidatos mais votados (em ordem decrescente de votação e respeitando número de vagas):\n";
+    int posicao = 1;
+    for (const auto& candidato : candidatosMaisVotados) {
+        if (posicao <= this->numEleitos) {
+            cout << posicao << " - " 
+                 << candidato->getNomeUrna(1) << " ("
+                 << candidato->getPartido().getSigla() << ", "
+                 << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
+        }
+
+        // Verifica candidatos que seriam eleitos no majoritário
+        if (!candidato->isEleito() && posicao <= this->numEleitos) {
+            candidatosSeriamEleitos.push_back(candidato);
+        }
+
+        // Verifica candidatos beneficiados pelo proporcional
+        if (candidato->isEleito() && posicao > this->numEleitos) {
+            candidatosEleitosPorProporcionalidade.push_back(candidato);
+        }
+
+        posicao++;
+    }
+
+    // Relatório: Candidatos que seriam eleitos no majoritário
+    cout << "\nTeriam sido eleitos se a votação fosse majoritária, e não foram eleitos:\n"
+         << "(com sua posição no ranking de mais votados)\n";
+    for (const auto& candidato : candidatosSeriamEleitos) {
+        auto it = find(candidatosMaisVotados.begin(), candidatosMaisVotados.end(), candidato);
+        if (it != candidatosMaisVotados.end()) {
+            int pos = distance(candidatosMaisVotados.begin(), it) + 1;
+            cout << pos << " - " 
+                 << candidato->getNomeUrna(1) << " ("
+                 << candidato->getPartido().getSigla() << ", "
+                 << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
+        }
+    }
+
+    // Relatório: Candidatos beneficiados pelo proporcional
+    cout << "\nEleitos, que se beneficiaram do sistema proporcional:\n"
+         << "(com sua posição no ranking de mais votados)\n";
+    for (const auto& candidato : candidatosEleitosPorProporcionalidade) {
+        auto it = find(candidatosMaisVotados.begin(), candidatosMaisVotados.end(), candidato);
+        if (it != candidatosMaisVotados.end()) {
+            int pos = distance(candidatosMaisVotados.begin(), it) + 1;
+            cout << pos << " - " 
+                 << candidato->getNomeUrna(1) << " ("
+                 << candidato->getPartido().getSigla() << ", "
+                 << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
+        }
+    }
+}
+
+void Eleicao::gerarRelatorios() {
+    //colocar relatorio 1 dps
+    geraRelatorioVereadoresEleitos(); // Relatorio 2
+    geraRelatoriosSobreMaisVotados(); // Relatorios 3, 4 e 5
+
+}
