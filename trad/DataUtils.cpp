@@ -49,3 +49,17 @@ int DataUtils::calculaPeriodoEmAnos(const DataUtils& outraData) const {
     
     return anos;
 }
+
+bool DataUtils::operator<(const DataUtils& outra) const {
+    if (ano != outra.ano) {
+        return ano < outra.ano;
+    }
+    if (mes != outra.mes) {
+        return mes < outra.mes;
+    }
+    return dia < outra.dia;
+}
+
+bool DataUtils::operator==(const DataUtils& outra) const {
+    return dia == outra.dia && mes == outra.mes && ano == outra.ano;
+}

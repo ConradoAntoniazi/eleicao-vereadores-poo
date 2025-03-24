@@ -22,6 +22,10 @@ public:
     int getDia() const { return dia; }
     int getMes() const { return mes; }
     int getAno() const { return ano; }
+
+    // sobrecarga de compararadores entre datas
+    bool operator<(const DataUtils& outra) const;
+    bool operator==(const DataUtils& outra) const;
 };
 
 #endif
