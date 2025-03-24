@@ -8,10 +8,7 @@
 
 using namespace std;
 
-static void trim(string &str) {
-    str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
-    str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
-}
+
 
 void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
     try {
@@ -39,7 +36,7 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
             while (getline(ss, campo, ';')) {
                 // Remover aspas e espaços em branco
                 campo.erase(remove(campo.begin(), campo.end(), '\"'), campo.end());
-                trim(campo);
+                UTF8Utils::trim(campo);
                 campos.push_back(campo);
             }
 

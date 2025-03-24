@@ -34,3 +34,8 @@ bool UTF8Utils::compare_pt_BR(const string &s1, const string &s2)
   return (col.compare(s1.data(), s1.data() + s1.size(),
                       s2.data(), s2.data() + s2.size()) < 0);
 }
+
+void UTF8Utils::trim(string &str) {
+  str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
+  str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
+}
