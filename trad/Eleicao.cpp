@@ -359,9 +359,58 @@ void Eleicao::geraRelatoriosSobreMaisVotados(){
     }
 }
 
+void Eleicao::geraRelatorioVotacaoPartidos(){
+    vector<Partido*> partidosOrdenados;
+
+    // Preenche o vetor com os partidos
+    for (const auto& par : partidos) {
+        partidosOrdenados.push_back(par.second);
+    }
+
+    // Ordena por total de votos (decrescente) e número do partido (crescente)
+    sort(partidosOrdenados.begin(), partidosOrdenados.end(),
+        [](Partido* a, Partido* b) {
+            if (a->getTotalVotos() != b->getTotalVotos()) {
+                return a->getTotalVotos() > b->getTotalVotos();
+            }
+            return a->getNumero() < b->getNumero();
+        });
+
+    cout << "\nVotação dos partidos e número de candidatos eleitos:\n";
+    int posicao = 1;
+    for (const auto& partido : partidosOrdenados) {
+        int votosNominais = partido->getVotosNominais();
+        int votosLegenda = partido->getVotosLegenda();
+        int totalVotos = partido->getTotalVotos();
+        int numEleitos = partido->getNumEleitos();
+
+        // Pluralização das strings
+        string votoStr = (totalVotos == 1) ? "voto" : "votos";
+        string votoNominalStr = (votosNominais == 1) ? "nominal" : "nominais";
+        string candidatoStr = (numEleitos == 1) ? "candidato eleito" : "candidatos eleitos";
+
+        if (totalVotos == 0) {
+            cout << posicao++ << " - " 
+                 << partido->getSigla() << " - " 
+                 << partido->getNumero() 
+                 << ", 0 voto (0 " << votoNominalStr 
+                 << " e 0 de legenda), 0 candidato eleito\n";
+        } else {
+            cout << posicao++ << " - "
+                 << partido->getSigla() << " - "
+                 << partido->getNumero() << ", "
+                 << ProcessaEntrada::formataNumero(totalVotos) << " " << votoStr << " ("
+                 << ProcessaEntrada::formataNumero(votosNominais) << " " << votoNominalStr
+                 << " e " << ProcessaEntrada::formataNumero(votosLegenda) << " de legenda), "
+                 << numEleitos << " " << candidatoStr << "\n";
+        }
+    }
+}
+
 void Eleicao::gerarRelatorios() {
     //colocar relatorio 1 dps
     geraRelatorioVereadoresEleitos(); // Relatorio 2
     geraRelatoriosSobreMaisVotados(); // Relatorios 3, 4 e 5
+    geraRelatorioVotacaoPartidos(); // Relatorio 6
 
 }
