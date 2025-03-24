@@ -3,7 +3,7 @@
 #include <cstdint>
 
 
-string iso_8859_1_to_utf8(string &str)
+string UTF8Utils::iso_8859_1_to_utf8(string &str)
 {
   // adaptado de: https://stackoverflow.com/a/39884120 :-)
   string strOut;
@@ -27,7 +27,7 @@ string iso_8859_1_to_utf8(string &str)
   return strOut;
 }
 
-bool compare_pt_BR(const string &s1, const string &s2)
+bool UTF8Utils::compare_pt_BR(const string &s1, const string &s2)
 {
   locale loc = locale("pt_BR.UTF-8");
   const collate<char> &col = use_facet<collate<char>>(loc);

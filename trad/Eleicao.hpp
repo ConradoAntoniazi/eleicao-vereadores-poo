@@ -12,22 +12,24 @@
 
 class Eleicao {
 private:
-    int codigoCidade;
+    const int codigoCidade;
+    const DataUtils data;
     int numEleitos;
-    DataUtils data;
 
     std::vector<Candidato> candidatosEleitos;
     std::map<int, Candidato> candidatos;
     std::map<int, Partido> partidos;
 
+    //static void trim();
+
 public:
-    Eleicao(int condigo, string dataStr);
+    Eleicao(const int& condigo,const string& dataStr);
 
     // getters na implementacao em java nao eram usados
     // entao serao ignorados aqui
 
-    void processarCandidatosPartidos(string caminhoArquivo);
-    void processarVotos(string caminhoArquivo);
+    void processarCandidatosPartidos(const string& caminhoArquivo);
+    void processarVotos(const string& caminhoArquivo);
     void gerarRelatorios();
 };
 
