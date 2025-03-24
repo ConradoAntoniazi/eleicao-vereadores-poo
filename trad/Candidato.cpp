@@ -8,21 +8,14 @@ using namespace std;
 
 Candidato::Candidato(const int& numero, const string& nomeUrna, Partido &partido,
                      const string &dataNascStr, const int& genero, const int& situacao)
-    : numero(numero),
-      nomeUrna(nomeUrna),
-      partido(&partido),
-      genero(Genero::fromCodigo(genero)), 
-      situacaoEleitoral(SituacaoEleitoral::fromCodigo(situacao)),
-      dataNascimento(DataUtils::fromString(dataNascStr))
-{
-
-    if (!(&partido))
-    {
-        throw invalid_argument("Partido não pode ser nulo");
-    }
-
-    this->votos = 0;
-}
+    : votos(0),          
+    numero(numero),     
+    nomeUrna(nomeUrna), 
+    partido(&partido),  
+    dataNascimento(DataUtils::fromString(dataNascStr)), 
+    genero(Genero::fromCodigo(genero)),               
+    situacaoEleitoral(SituacaoEleitoral::fromCodigo(situacao))
+{}
 
 // Getters
 int Candidato::getNumero() const { return numero; }
