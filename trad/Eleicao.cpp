@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "Eleicao.hpp"
-#include "UTF8Utils.hpp"
+#include "ProcessaEntrada.hpp"
 #include <iostream>
 
 using namespace std;
@@ -22,22 +22,27 @@ using namespace std;
 #define COLUNA_GENERO_CANDIDATO 38
 #define COLUNA_SITUACAO_CANDIDATO 48
 
-#define MAIOR_COLUNA_OBSERVADA 48
+#define MAIOR_IDX_COLUNA_OBSERVADO 48
 
-void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
-    try {
+void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
+{
+    try
+    {
         ifstream arquivo(caminhoArquivo, ios::binary);
-        if (!arquivo.is_open()) {
+        if (!arquivo.is_open())
+        {
             throw runtime_error("Não foi possível abrir o arquivo");
         }
 
         string linha;
         bool primeiraLinha = true;
 
-        while (getline(arquivo, linha)) {
-            string linhaUtf8 = UTF8Utils::iso_8859_1_to_utf8(linha);
+        while (getline(arquivo, linha))
+        {
+            string linhaUtf8 = ProcessaEntrada::iso_8859_1_to_utf8(linha);
 
-            if (primeiraLinha) {
+            if (primeiraLinha)
+            {
                 primeiraLinha = false;
                 continue;
             }
@@ -47,37 +52,41 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
             string campo;
 
             // Dividir a linha por ';'
-            while (getline(ss, campo, ';')) {
+            while (getline(ss, campo, ';'))
+            {
                 // Remover aspas e espaços em branco
                 campo.erase(remove(campo.begin(), campo.end(), '\"'), campo.end());
-                UTF8Utils::trim(campo);
+                ProcessaEntrada::trim(campo);
                 campos.push_back(campo);
             }
 
-            if (campos.size() < (MAIOR_COLUNA_OBSERVADA + 1)) {
+            if (campos.size() < (MAIOR_IDX_COLUNA_OBSERVADO + 1))
+            {
                 cerr << "Linha incompleta: " << linhaUtf8 << endl;
                 continue;
             }
 
-            try {
+            try
+            {
                 // Processar campos numéricos
                 int codigoCargo = stoi(campos[13]);
                 int codigoMunicipio = stoi(campos[11]);
                 int situacaoTurno = stoi(campos[48]);
 
                 // Filtros iniciais
-                if (codigoCargo != 13 || codigoMunicipio != this->codigoCidade || situacaoTurno == -1) {
+                if (codigoCargo != 13 || codigoMunicipio != this->codigoCidade || situacaoTurno == -1)
+                {
                     int numPartido = stoi(campos[25]);
                     int numeroFederacao = stoi(campos[28]);
 
                     // Criar partido se não existir
-                    if (partidos.find(numPartido) == partidos.end()) {
-                        Partido* novoPartido = new Partido(
+                    if (partidos.find(numPartido) == partidos.end())
+                    {
+                        Partido *novoPartido = new Partido(
                             numPartido,
                             campos[26],
                             campos[27],
-                            numeroFederacao
-                        );
+                            numeroFederacao);
                         partidos.emplace(numPartido, novoPartido);
                     }
                     continue;
@@ -89,13 +98,13 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
 
                 // Criar/recuperar partido
                 auto itPartido = partidos.find(numPartido);
-                if (itPartido == partidos.end()) {
-                    Partido* novoPartido = new Partido(
+                if (itPartido == partidos.end())
+                {
+                    Partido *novoPartido = new Partido(
                         numPartido,
                         campos[26],
                         campos[27],
-                        numeroFederacao
-                    );
+                        numeroFederacao);
                     partidos.emplace(numPartido, novoPartido);
                     itPartido = partidos.find(numPartido);
                 }
@@ -108,18 +117,17 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
                 int situacao = stoi(campos[48]);
 
                 // Criar candidato
-                Candidato* candAux = new Candidato(
+                Candidato *candAux = new Candidato(
                     numero,
                     nomeUrna,
-                    *(itPartido->second), // Passa a referência do partido
+                    *(itPartido->second), // referência do partido
                     dataNascimento,
                     genero,
-                    situacao
-                );
-                
+                    situacao);
 
                 // Verificar se foi eleito
-                if (candAux->isEleito()) {
+                if (candAux->isEleito())
+                {
                     numEleitos++;
                     candidatosEleitos.push_back(candAux);
                 }
@@ -127,19 +135,114 @@ void Eleicao::processarCandidatosPartidos(const string& caminhoArquivo) {
                 // Adicionar aos containers
                 candidatos[numero] = candAux;
                 itPartido->second->addCandidato(candAux);
-
-            } catch (const invalid_argument& e) {
+            }
+            catch (const invalid_argument &e)
+            {
                 cerr << "Erro de conversão numérica: " << e.what() << endl;
                 continue;
-            } catch (const out_of_range& e) {
+            }
+            catch (const out_of_range &e)
+            {
                 cerr << "Índice de campo inválido: " << e.what() << endl;
                 continue;
             }
         }
         arquivo.close();
-
-    } catch (const exception& e) {
+    }
+    catch (const exception &e)
+    {
         cerr << "Erro durante o processamento: " << e.what() << endl;
     }
 }
 
+void Eleicao::processarVotos(const string &caminhoArquivo)
+{
+    try
+    {
+        ifstream arquivo(caminhoArquivo, ios::binary);
+        if (!arquivo.is_open())
+        {
+            throw runtime_error("Não foi possível abrir o arquivo de votação");
+        }
+
+        string linha;
+        bool primeiraLinha = true;
+
+        while (getline(arquivo, linha))
+        {
+            if (primeiraLinha)
+            {
+                primeiraLinha = false;
+                continue;
+            }
+
+            string linhaUtf8 = ProcessaEntrada::iso_8859_1_to_utf8(linha);
+            vector<string> campos;
+            stringstream ss(linhaUtf8);
+            string campo;
+
+            while (getline(ss, campo, ';'))
+            {
+                //campo.erase(remove(campo.begin(), campo.end(), '\"'), campo.end());
+                ProcessaEntrada::removeAspas(campo);
+                ProcessaEntrada::trim(campo);
+                campos.push_back(campo);
+            }
+
+            try
+            {
+                if (campos.size() < 22)
+                {
+                    throw out_of_range("Linha com campos insuficientes");
+                }
+
+                int codigoCargo = stoi(campos[17]);     // CD_CARGO
+                int codigoMunicipio = stoi(campos[13]); // CD_MUNICIPIO
+                int numeroVotavel = stoi(campos[19]);   // NR_VOTAVEL
+                int quantidadeVotos = stoi(campos[21]); // QT_VOTOS
+
+                if (codigoCargo != 13 || codigoMunicipio != this->codigoCidade)
+                {
+                    continue;
+                }
+
+                // Ignora votos brancos/nulos (95-98)
+                if (numeroVotavel >= 95 && numeroVotavel <= 98)
+                {
+                    continue;
+                }
+
+                // Verifica se é voto nominal (candidato)
+                auto itCandidato = candidatos.find(numeroVotavel);
+                if (itCandidato != candidatos.end())
+                {
+                    itCandidato->second->addVotos(quantidadeVotos);
+                }
+                // Verifica se é voto de legenda (partido)
+                else
+                {
+                    auto itPartido = partidos.find(numeroVotavel);
+                    if (itPartido != partidos.end())
+                    {
+                        itPartido->second->addVotosLegenda(quantidadeVotos);
+                    }
+                }
+            }
+            catch (const invalid_argument &e)
+            {
+                cerr << "Erro de conversão numérica na linha ignorada: " << e.what() << endl;
+                continue;
+            }
+            catch (const out_of_range &e)
+            {
+                cerr << "Linha mal formatada ou incompleta: " << e.what() << endl;
+                continue;
+            }
+        }
+        arquivo.close();
+    }
+    catch (const exception &e)
+    {
+        cerr << "Erro durante o processamento dos votos: " << e.what() << endl;
+    }
+}

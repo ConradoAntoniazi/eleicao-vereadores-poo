@@ -1,9 +1,9 @@
-#include "UTF8Utils.hpp"
+#include "ProcessaEntrada.hpp"
 #include <locale>
 #include <cstdint>
+#include <algorithm>
 
-
-string UTF8Utils::iso_8859_1_to_utf8(string &str)
+string ProcessaEntrada::iso_8859_1_to_utf8(string &str)
 {
   // adaptado de: https://stackoverflow.com/a/39884120 :-)
   string strOut;
@@ -27,7 +27,7 @@ string UTF8Utils::iso_8859_1_to_utf8(string &str)
   return strOut;
 }
 
-bool UTF8Utils::compare_pt_BR(const string &s1, const string &s2)
+bool ProcessaEntrada::compare_pt_BR(const string &s1, const string &s2)
 {
   locale loc = locale("pt_BR.UTF-8");
   const collate<char> &col = use_facet<collate<char>>(loc);
@@ -35,7 +35,12 @@ bool UTF8Utils::compare_pt_BR(const string &s1, const string &s2)
                       s2.data(), s2.data() + s2.size()) < 0);
 }
 
-void UTF8Utils::trim(string &str) {
+void ProcessaEntrada::trim(string &str)
+{
   str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
   str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
+}
+
+void ProcessaEntrada::removeAspas(string &str){
+  str.erase(remove(str.begin(), str.end(), '\"'), str.end());
 }
