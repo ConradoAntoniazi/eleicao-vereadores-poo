@@ -20,6 +20,8 @@ private:
     std::map<int, Candidato*> candidatos;
     std::map<int, Partido*> partidos;
 
+    void geraRelatorioVereadoresEleitos();
+
 public:
     Eleicao(const int& condigo,const string& dataStr);
 

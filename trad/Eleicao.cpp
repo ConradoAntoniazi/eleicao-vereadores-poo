@@ -252,3 +252,37 @@ void Eleicao::processarVotos(const string &caminhoArquivo)
         cerr << "Erro durante o processamento dos votos: " << e.what() << endl;
     }
 }
+
+void Eleicao::geraRelatorioVereadoresEleitos() {
+    // Primeiro relatório: Vereadores eleitos
+    vector<Candidato*> candidatosEleitos;
+    
+    // Coleta todos os candidatos eleitos
+    for (const auto& par : candidatos) {
+        if (par.second->isEleito()) {
+            candidatosEleitos.push_back(par.second);
+        }
+    }
+
+    // Ordena por votos (decrescente) e data nascimento (crescente)
+    sort(candidatosEleitos.begin(), candidatosEleitos.end(),
+        [](Candidato* a, Candidato* b) {
+            if (a->getVotos() != b->getVotos()) {
+                return a->getVotos() > b->getVotos();
+            }
+            return a->getDataNascimento() < b->getDataNascimento();
+        });
+
+    // Imprime o relatório
+    cout << "Vereadores eleitos:\n";
+    int posicao = 1;
+    for (const auto& candidato : candidatosEleitos) {
+        cout << posicao << " - " 
+             << candidato->getNomeUrna(1) << " ("
+             << candidato->getPartido().getSigla() << ", "
+             << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
+        posicao++;
+    }
+    cout << "\n"; // Espaço entre relatórios
+}
+
