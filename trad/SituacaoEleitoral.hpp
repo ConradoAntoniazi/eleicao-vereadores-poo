@@ -4,13 +4,11 @@
 #include <stdexcept>
 #include <vector>
 
-using namespace std;
-
 class SituacaoEleitoral {
 public:
     enum Tipo {
-        CANDIDATURA_INVALIDA,
-        ELEITO,
+        CANDIDATURA_INVALIDA = -1,
+        ELEITO = 1,
         ELEITO_POR_QUOCIENTE_PARTIDARIO,
         ELEITO_POR_MEDIA,
         NAO_ELEITO,
@@ -30,7 +28,7 @@ private:
         int codigo;
     };
 
-    static const vector<ValorSituacao> valores;
+    static const std::vector<ValorSituacao> valores;
 };
 
 #endif

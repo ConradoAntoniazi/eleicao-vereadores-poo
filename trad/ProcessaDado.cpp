@@ -1,4 +1,4 @@
-#include "ProcessaEntrada.hpp"
+#include "ProcessaDado.hpp"
 
 #include <locale>
 #include <cstdint>
@@ -7,7 +7,9 @@
 #include <iomanip>
 #include <iostream>
 
-string ProcessaEntrada::iso_8859_1_to_utf8(string &str)
+using namespace std;
+
+string ProcessaDado::iso_8859_1_to_utf8(string &str)
 {
   // adaptado de: https://stackoverflow.com/a/39884120 :-)
   string strOut;
@@ -31,36 +33,26 @@ string ProcessaEntrada::iso_8859_1_to_utf8(string &str)
   return strOut;
 }
 
-bool ProcessaEntrada::compare_pt_BR(const string &s1, const string &s2)
-{
-  locale loc = locale("pt_BR.UTF-8");
-  const collate<char> &col = use_facet<collate<char>>(loc);
-  return (col.compare(s1.data(), s1.data() + s1.size(),
-                      s2.data(), s2.data() + s2.size()) < 0);
-}
-
-void ProcessaEntrada::trim(string &str)
+void ProcessaDado::trim(string &str)
 {
   str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
   str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
 }
 
-void ProcessaEntrada::removeAspas(string &str){
+void ProcessaDado::removeAspas(string &str)
+{
   str.erase(remove(str.begin(), str.end(), '\"'), str.end());
 }
 
-string ProcessaEntrada::formataNumero(const int& numero) {
+string ProcessaDado::formataNumero(const int &numero)
+{
   stringstream ss;
-  ss.imbue(locale("pt_BR.UTF-8"));
   ss << fixed << numero;
   return ss.str();
 }
 
-string ProcessaEntrada::formataPercentual(const int& qtd, const int& total){
-  if(total <= 0){
-    cout << "ERRO EM FORMATA PERCENTUAL" << endl;
-  }
-  
+string ProcessaDado::formataPercentual(const int &qtd, const int &total)
+{
   double percent = (total > 0) ? ((qtd * 100.0) / total) : 0.0;
   stringstream ss;
   ss << fixed << setprecision(2) << percent << "%";

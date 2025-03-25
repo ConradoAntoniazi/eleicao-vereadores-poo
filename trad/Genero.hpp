@@ -3,14 +3,12 @@
 
 #include <vector>
 
-using namespace std;
-
 class Genero {
 public:
     enum Tipo {
-        MASCULINO,
-        FEMININO,
-        NAO_INFORMADO
+        MASCULINO = 2,
+        FEMININO = 4,
+        NAO_INFORMADO = 0
     };
 
     Genero(Tipo tipo);
@@ -26,7 +24,7 @@ private:
         int codigo;
     };
 
-    static const vector<ValorGenero> valores;
+    static const std::vector<ValorGenero> valores;
 };
 
 #endif
