@@ -21,7 +21,7 @@ FONTES = $(wildcard *.cpp)
 OBJETOS = $(FONTES:.cpp=.o)
 
 # nome do arquivo executável
-EXECUTAVEL = deputados
+EXECUTAVEL = vereadores
 
 ############ alvos
 #
