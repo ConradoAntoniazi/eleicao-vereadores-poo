@@ -29,7 +29,7 @@ using namespace std;
 #define COLUNA_VOTACAO_QTD_VOTOS 21
 
 
-Eleicao::Eleicao(const int& codigo,const string& dataStr): codigoCidade(codigo), data(dataStr){}
+Eleicao::Eleicao(const int& codigo,const string& dataStr): numEleitos(0), codigoCidade(codigo), data(dataStr){}
 
 void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
 {
@@ -62,7 +62,6 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
             while (getline(ss, campo, ';'))
             {
                 // Remover aspas e espaços em branco
-                //campo.erase(remove(campo.begin(), campo.end(), '\"'), campo.end());
                 ProcessaEntrada::removeAspas(campo);
                 ProcessaEntrada::trim(campo);
                 campos.push_back(campo);
@@ -91,7 +90,7 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
                     // Criar partido se não existir
                     if (partidos.find(numPartido) == partidos.end())
                     {
-                        Partido *novoPartido = new Partido(
+                        auto novoPartido = make_shared<Partido>(
                             numPartido,
                             campos[COLUNA_SIGLA_PARTIDO],
                             campos[COLUNA_NOME_PARTIDO],
@@ -109,7 +108,7 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
                 auto itPartido = partidos.find(numPartido);
                 if (itPartido == partidos.end())
                 {
-                    Partido *novoPartido = new Partido(
+                    auto novoPartido = make_shared<Partido>(
                         numPartido,
                         campos[COLUNA_SIGLA_PARTIDO],
                         campos[COLUNA_NOME_PARTIDO],
@@ -126,15 +125,14 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
                 int situacao = stoi(campos[COLUNA_SITUACAO_CANDIDATO]);
 
                 // Criar candidato
-                Candidato *candAux = new Candidato(
+                auto candAux = make_shared<Candidato>(
                     numero,
                     nomeUrna,
-                    *(itPartido->second), // referência do partido
+                    itPartido->second,
                     dataNascimento,
                     genero,
                     situacao);
 
-                // Verificar se foi eleito
                 if (candAux->isEleito())
                 {
                     numEleitos++;
@@ -164,222 +162,176 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
     }
 }
 
-void Eleicao::processarVotos(const string &caminhoArquivo)
-{
-    try
-    {
+void Eleicao::processarVotos(const string &caminhoArquivo) {
+    try {
         ifstream arquivo(caminhoArquivo, ios::binary);
-        if (!arquivo.is_open())
-        {
+        if (!arquivo.is_open()) {
             throw runtime_error("Não foi possível abrir o arquivo de votação");
         }
 
         string linha;
         bool primeiraLinha = true;
 
-        while (getline(arquivo, linha))
-        {
-            if (primeiraLinha)
-            {
+        while (getline(arquivo, linha)) {
+            if (primeiraLinha) {
                 primeiraLinha = false;
                 continue;
             }
 
-            string linhaUtf8 = ProcessaEntrada::iso_8859_1_to_utf8(linha);
             vector<string> campos;
-            stringstream ss(linhaUtf8);
-            string campo;
-
-            while (getline(ss, campo, ';'))
-            {
-                //campo.erase(remove(campo.begin(), campo.end(), '\"'), campo.end());
-                ProcessaEntrada::removeAspas(campo);
-                ProcessaEntrada::trim(campo);
-                campos.push_back(campo);
+            size_t start = 0, end = 0;
+            while ((end = linha.find(';', start)) != string::npos) {
+                campos.push_back(linha.substr(start, end - start));
+                start = end + 1;
             }
+            campos.push_back(linha.substr(start)); // Último campo
 
-            try
-            {
-                if (campos.size() < 22)
-                {
-                    throw out_of_range("Linha com campos insuficientes");
-                }
-
-                int codigoCargo = stoi(campos[COLUNA_VOTACAO_CODIGO_CARGO]);     // CD_CARGO
-                int codigoMunicipio = stoi(campos[COLUNA_VOTACAO_CODIGO_MUNICIPO]); // CD_MUNICIPIO
-                int numeroVotavel = stoi(campos[COLUNA_VOTACAO_NUMERO_VOTAVEL]);   // NR_VOTAVEL
-                int quantidadeVotos = stoi(campos[COLUNA_VOTACAO_QTD_VOTOS]); // QT_VOTOS
-
-                if (codigoCargo != 13 || codigoMunicipio != this->codigoCidade)
-                {
-                    continue;
-                }
-
-                // Ignora votos brancos/nulos (95-98)
-                if (numeroVotavel >= 95 && numeroVotavel <= 98)
-                {
-                    continue;
-                }
-
-                // Verifica se é voto nominal (candidato)
-                auto itCandidato = candidatos.find(numeroVotavel);
-                if (itCandidato != candidatos.end())
-                {
-                    itCandidato->second->addVotos(quantidadeVotos);
-                }
-                // Verifica se é voto de legenda (partido)
-                else
-                {
-                    auto itPartido = partidos.find(numeroVotavel);
-                    if (itPartido != partidos.end())
-                    {
-                        itPartido->second->addVotosLegenda(quantidadeVotos);
-                    }
-                }
-            }
-            catch (const invalid_argument &e)
-            {
-                cerr << "Erro de conversão numérica na linha ignorada: " << e.what() << endl;
+            if (campos.size() < 22) {
+                cerr << "Linha com campos insuficientes" << endl;
                 continue;
             }
-            catch (const out_of_range &e)
-            {
-                cerr << "Linha mal formatada ou incompleta: " << e.what() << endl;
+
+            char *endPtr;
+            int codigoCargo = strtol(campos[COLUNA_VOTACAO_CODIGO_CARGO].c_str(), &endPtr, 10);
+            int codigoMunicipio = strtol(campos[COLUNA_VOTACAO_CODIGO_MUNICIPO].c_str(), &endPtr, 10);
+            int numeroVotavel = strtol(campos[COLUNA_VOTACAO_NUMERO_VOTAVEL].c_str(), &endPtr, 10);
+            int quantidadeVotos = strtol(campos[COLUNA_VOTACAO_QTD_VOTOS].c_str(), &endPtr, 10);
+
+            if (codigoCargo != 13 || codigoMunicipio != this->codigoCidade) {
                 continue;
+            }
+
+            if (numeroVotavel >= 95 && numeroVotavel <= 98) {
+                continue;
+            }
+
+            auto itCandidato = candidatos.find(numeroVotavel);
+            if (itCandidato != candidatos.end()) {
+                itCandidato->second->addVotos(quantidadeVotos);
+            } else {
+                auto itPartido = partidos.find(numeroVotavel);
+                if (itPartido != partidos.end()) {
+                    itPartido->second->addVotosLegenda(quantidadeVotos);
+                }
             }
         }
         arquivo.close();
-    }
-    catch (const exception &e)
-    {
+    } catch (const exception &e) {
         cerr << "Erro durante o processamento dos votos: " << e.what() << endl;
     }
 }
 
 void Eleicao::geraRelatorioVereadoresEleitos() {
-    // Primeiro relatório: Vereadores eleitos
-    vector<Candidato*> candidatosEleitos;
+    // Ao contrario de C, isso aqui faz uma copia do vetor candidatosEletios
+    // (ainda que eles apontem para os mesmos objetos, por serem vetores de ponteiros)
+    std::vector<std::shared_ptr<Candidato>> sortedCandidates = this->candidatosEleitos;
     
-    // Coleta todos os candidatos eleitos
-    for (const auto& par : candidatos) {
-        if (par.second->isEleito()) {
-            candidatosEleitos.push_back(par.second);
-        }
-    }
-
-    // Ordena por votos (decrescente) e data nascimento (crescente)
-    sort(candidatosEleitos.begin(), candidatosEleitos.end(),
-        [](Candidato* a, Candidato* b) {
-            if (a->getVotos() != b->getVotos()) {
-                return a->getVotos() > b->getVotos();
-            }
-            return a->getDataNascimento() < b->getDataNascimento();
-        });
-
-    // Imprime o relatório
-    cout << "\nVereadores eleitos:\n";
+    // Ordena por votos (decrescente) e, em caso de empate, por data de nascimento (crescente)
+    std::sort(sortedCandidates.begin(), sortedCandidates.end(),
+         [](const std::shared_ptr<Candidato>& a, const std::shared_ptr<Candidato>& b) {
+             if (a->getVotos() != b->getVotos())
+                 return a->getVotos() > b->getVotos();
+             return a->getDataNascimento() < b->getDataNascimento();
+         });
+    
+    std::cout << "\nVereadores eleitos:\n";
     int posicao = 1;
-    for (const auto& candidato : candidatosEleitos) {
-        cout << posicao << " - " 
-             << candidato->getNomeUrna(1) << " ("
-             << candidato->getPartido().getSigla() << ", "
-             << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
+    for (const auto& candidato : sortedCandidates) {
+        // Agora getPartido() retorna um shared_ptr, entao usa-se "->" para acessar getSigla()
+        std::cout << posicao << " - " 
+                  << candidato->getNomeUrna(1) << " ("
+                  << candidato->getPartido()->getSigla() << ", "
+                  << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
         posicao++;
     }
-    cout << "\n"; // Espaço entre relatórios
+    std::cout << "\n"; // Espaço entre relatórios
 }
 
-void Eleicao::geraRelatoriosSobreMaisVotados(){
-    // Relatório de mais votados e comparação entre sistemas
-    vector<Candidato*> candidatosMaisVotados;
-    
-    // Preenche com todos os candidatos
+void Eleicao::geraRelatoriosSobreMaisVotados() {
+    std::vector<std::shared_ptr<Candidato>> candidatosMaisVotados;
     for (const auto& par : candidatos) {
         candidatosMaisVotados.push_back(par.second);
     }
 
-    // Ordena por votos (decrescente) e data nascimento (crescente)
-    sort(candidatosMaisVotados.begin(), candidatosMaisVotados.end(),
-        [](Candidato* a, Candidato* b) {
-            if (a->getVotos() != b->getVotos()) {
-                return a->getVotos() > b->getVotos();
-            }
-            return a->getDataNascimento() < b->getDataNascimento();
-        });
+    // Ordena por votos (decrescente) e, em caso de empate, por data de nascimento (crescente)
+    std::sort(candidatosMaisVotados.begin(), candidatosMaisVotados.end(),
+         [](const std::shared_ptr<Candidato>& a, const std::shared_ptr<Candidato>& b) {
+             if (a->getVotos() != b->getVotos())
+                 return a->getVotos() > b->getVotos();
+             return a->getDataNascimento() < b->getDataNascimento();
+         });
 
-    vector<Candidato*> candidatosSeriamEleitos;
-    vector<Candidato*> candidatosEleitosPorProporcionalidade;
+    std::vector<std::shared_ptr<Candidato>> candidatosSeriamEleitos;
+    std::vector<std::shared_ptr<Candidato>> candidatosEleitosPorProporcionalidade;
 
-    cout << "\nCandidatos mais votados (em ordem decrescente de votação e respeitando número de vagas):\n";
+    std::cout << "\nCandidatos mais votados (em ordem decrescente de votação e respeitando número de vagas):\n";
     int posicao = 1;
     for (const auto& candidato : candidatosMaisVotados) {
         if (posicao <= this->numEleitos) {
-            cout << posicao << " - " 
-                 << candidato->getNomeUrna(1) << " ("
-                 << candidato->getPartido().getSigla() << ", "
-                 << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
+            std::cout << posicao << " - " 
+                      << candidato->getNomeUrna(1) << " ("
+                      << candidato->getPartido()->getSigla() << ", "
+                      << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
         }
 
-        // Verifica candidatos que seriam eleitos no majoritário
+        // Se candidato não foi eleito mas está dentro do número de vagas, 
+        // ele seria eleito no sistema majoritário.
         if (!candidato->isEleito() && posicao <= this->numEleitos) {
             candidatosSeriamEleitos.push_back(candidato);
         }
 
-        // Verifica candidatos beneficiados pelo proporcional
+        // Se candidato foi eleito, mas está abaixo do número de vagas,
+        // se beneficiou do sistema proporcional.
         if (candidato->isEleito() && posicao > this->numEleitos) {
             candidatosEleitosPorProporcionalidade.push_back(candidato);
         }
-
         posicao++;
     }
 
-    // Relatório: Candidatos que seriam eleitos no majoritário
-    cout << "\nTeriam sido eleitos se a votação fosse majoritária, e não foram eleitos:\n"
-         << "(com sua posição no ranking de mais votados)\n";
+    // Relatório: Candidatos que seriam eleitos no sistema majoritário
+    std::cout << "\nTeriam sido eleitos se a votação fosse majoritária, e não foram eleitos:\n"
+              << "(com sua posição no ranking de mais votados)\n";
     for (const auto& candidato : candidatosSeriamEleitos) {
-        auto it = find(candidatosMaisVotados.begin(), candidatosMaisVotados.end(), candidato);
+        auto it = std::find(candidatosMaisVotados.begin(), candidatosMaisVotados.end(), candidato);
         if (it != candidatosMaisVotados.end()) {
-            int pos = distance(candidatosMaisVotados.begin(), it) + 1;
-            cout << pos << " - " 
-                 << candidato->getNomeUrna(1) << " ("
-                 << candidato->getPartido().getSigla() << ", "
-                 << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
+            int pos = std::distance(candidatosMaisVotados.begin(), it) + 1;
+            std::cout << pos << " - " 
+                      << candidato->getNomeUrna(1) << " ("
+                      << candidato->getPartido()->getSigla() << ", "
+                      << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
         }
     }
 
-    // Relatório: Candidatos beneficiados pelo proporcional
-    cout << "\nEleitos, que se beneficiaram do sistema proporcional:\n"
-         << "(com sua posição no ranking de mais votados)\n";
+    // Relatório: Candidatos beneficiados pelo sistema proporcional
+    std::cout << "\nEleitos, que se beneficiaram do sistema proporcional:\n"
+              << "(com sua posição no ranking de mais votados)\n";
     for (const auto& candidato : candidatosEleitosPorProporcionalidade) {
-        auto it = find(candidatosMaisVotados.begin(), candidatosMaisVotados.end(), candidato);
+        auto it = std::find(candidatosMaisVotados.begin(), candidatosMaisVotados.end(), candidato);
         if (it != candidatosMaisVotados.end()) {
-            int pos = distance(candidatosMaisVotados.begin(), it) + 1;
-            cout << pos << " - " 
-                 << candidato->getNomeUrna(1) << " ("
-                 << candidato->getPartido().getSigla() << ", "
-                 << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
+            int pos = std::distance(candidatosMaisVotados.begin(), it) + 1;
+            std::cout << pos << " - " 
+                      << candidato->getNomeUrna(1) << " ("
+                      << candidato->getPartido()->getSigla() << ", "
+                      << ProcessaEntrada::formataNumero(candidato->getVotos()) << " votos)\n";
         }
     }
 }
 
 void Eleicao::geraRelatorioVotacaoPartidos(){
-    vector<Partido*> partidosOrdenados;
-
-    // Preenche o vetor com os partidos
+    std::vector<std::shared_ptr<Partido>> partidosOrdenados;
     for (const auto& par : partidos) {
         partidosOrdenados.push_back(par.second);
     }
 
-    // Ordena por total de votos (decrescente) e número do partido (crescente)
-    sort(partidosOrdenados.begin(), partidosOrdenados.end(),
-        [](Partido* a, Partido* b) {
-            if (a->getTotalVotos() != b->getTotalVotos()) {
+    // Ordena por total de votos (decrescente) e, em caso de empate, por número do partido (crescente)
+    std::sort(partidosOrdenados.begin(), partidosOrdenados.end(),
+        [](const std::shared_ptr<Partido>& a, const std::shared_ptr<Partido>& b) {
+            if (a->getTotalVotos() != b->getTotalVotos())
                 return a->getTotalVotos() > b->getTotalVotos();
-            }
             return a->getNumero() < b->getNumero();
         });
 
-    cout << "\nVotação dos partidos e número de candidatos eleitos:\n";
+    std::cout << "\nVotação dos partidos e número de candidatos eleitos:\n";
     int posicao = 1;
     for (const auto& partido : partidosOrdenados) {
         int votosNominais = partido->getVotosNominais();
@@ -388,105 +340,99 @@ void Eleicao::geraRelatorioVotacaoPartidos(){
         int numEleitos = partido->getNumEleitos();
 
         // Pluralização das strings
-        string votoStr = (totalVotos == 1) ? "voto" : "votos";
-        string votoNominalStr = (votosNominais == 1) ? "nominal" : "nominais";
-        string candidatoStr = (numEleitos == 1) ? "candidato eleito" : "candidatos eleitos";
+        std::string votoStr = (totalVotos == 1) ? "voto" : "votos";
+        std::string votoNominalStr = (votosNominais == 1) ? "nominal" : "nominais";
+        std::string candidatoStr = (numEleitos == 1) ? "candidato eleito" : "candidatos eleitos";
 
         if (totalVotos == 0) {
-            cout << posicao++ << " - " 
-                 << partido->getSigla() << " - " 
-                 << partido->getNumero() 
-                 << ", 0 voto (0 " << votoNominalStr 
-                 << " e 0 de legenda), 0 candidato eleito\n";
+            std::cout << posicao++ << " - " 
+                      << partido->getSigla() << " - " 
+                      << partido->getNumero() 
+                      << ", 0 voto (0 " << votoNominalStr 
+                      << " e 0 de legenda), 0 candidato eleito\n";
         } else {
-            cout << posicao++ << " - "
-                 << partido->getSigla() << " - "
-                 << partido->getNumero() << ", "
-                 << ProcessaEntrada::formataNumero(totalVotos) << " " << votoStr << " ("
-                 << ProcessaEntrada::formataNumero(votosNominais) << " " << votoNominalStr
-                 << " e " << ProcessaEntrada::formataNumero(votosLegenda) << " de legenda), "
-                 << numEleitos << " " << candidatoStr << "\n";
+            std::cout << posicao++ << " - "
+                      << partido->getSigla() << " - "
+                      << partido->getNumero() << ", "
+                      << ProcessaEntrada::formataNumero(totalVotos) << " " << votoStr << " ("
+                      << ProcessaEntrada::formataNumero(votosNominais) << " " << votoNominalStr
+                      << " e " << ProcessaEntrada::formataNumero(votosLegenda) << " de legenda), "
+                      << numEleitos << " " << candidatoStr << "\n";
         }
     }
 }
 
-void Eleicao::geraRelatorioPrimeiroUltimoPartido(){
-    vector<Partido*> partidosValidos;
-
-    // Filtra partidos com candidatos
+void Eleicao::geraRelatorioPrimeiroUltimoPartido() {
+    // Cria um vetor de smart pointers para os partidos que possuem candidatos
+    std::vector<std::shared_ptr<Partido>> partidosValidos;
     for (const auto& par : partidos) {
         if (!par.second->getCandidatos().empty()) {
             partidosValidos.push_back(par.second);
         }
     }
 
-    // Ordena partidos pelo candidato mais votado
-    sort(partidosValidos.begin(), partidosValidos.end(),
-    [](Partido* a, Partido* b) {
-        Candidato* c1 = a->getCandidatoMaisVotado();
-        Candidato* c2 = b->getCandidatoMaisVotado();
+    // Ordena os partidos pelo candidato mais votado
+    std::sort(partidosValidos.begin(), partidosValidos.end(),
+        [](const std::shared_ptr<Partido>& a, const std::shared_ptr<Partido>& b) {
+            // Obtém os candidatos mais votados (smart pointers)
+            auto c1 = a->getCandidatoMaisVotado();
+            auto c2 = b->getCandidatoMaisVotado();
 
-        // Tratamento de nulos
-        if (!c1 || !c2) {
-            // Se ambos são nulos, ordena pelo número do partido
-            if (!c1 && !c2) return a->getNumero() < b->getNumero();
-            // Partidos com candidato nulo vão para o final
-            return c2 != nullptr; 
-        }
+            // Tratamento de nulos
+            if (!c1 || !c2) {
+                if (!c1 && !c2)
+                    return a->getNumero() < b->getNumero();
+                return (c2 != nullptr);
+            }
+            // Comparação principal: votos decrescentes; em empate, número do partido (crescente)
+            if (c1->getVotos() != c2->getVotos())
+                return c1->getVotos() > c2->getVotos();
+            return a->getNumero() < b->getNumero();
+        });
 
-        // Comparação principal
-        if (c1->getVotos() != c2->getVotos()) {
-            return c1->getVotos() > c2->getVotos(); // Decrescente
-        }
-        return a->getNumero() < b->getNumero(); // Crescente
-    });
-
-    cout << "\nPrimeiro e último colocados de cada partido:\n";
+    std::cout << "\nPrimeiro e último colocados de cada partido:\n";
     int posicao = 1;
     for (const auto& partido : partidosValidos) {
-        if (partido->getCandidatos().size() == 1) continue;
+        // Ignora partidos com apenas um candidato
+        if (partido->getCandidatos().size() == 1)
+            continue;
 
-        // Obtém e ordena candidatos válidos
-        vector<Candidato*> candidatos;
-        for (auto c : partido->getCandidatos()) {
-            if (c) candidatos.push_back(c);  // Filtra nulls
-        }
-
-        // Ordena por votos e data de nascimento
-        sort(candidatos.begin(), candidatos.end(),
-            [](Candidato* a, Candidato* b) {
-                if (a->getVotos() != b->getVotos()) {
+        // Obtém e ordena os candidatos válidos
+        std::vector<std::shared_ptr<Candidato>> candidatos = partido->getCandidatos();
+        std::sort(candidatos.begin(), candidatos.end(),
+            [](const std::shared_ptr<Candidato>& a, const std::shared_ptr<Candidato>& b) {
+                if (a->getVotos() != b->getVotos())
                     return a->getVotos() > b->getVotos();
-                }
                 return a->getDataNascimento() < b->getDataNascimento();
             });
 
-        if (candidatos.empty()) continue;
+        if (candidatos.empty())
+            continue;
 
-        Candidato* primeiro = candidatos.front();
-        Candidato* ultimo = candidatos.back();
+        auto primeiro = candidatos.front();
+        auto ultimo = candidatos.back();
 
-        string votoPrimeiro = (primeiro->getVotos() == 1) ? "voto" : "votos";
-        string votoUltimo = (ultimo->getVotos() == 1) ? "voto" : "votos";
+        std::string votoPrimeiro = (primeiro->getVotos() == 1) ? "voto" : "votos";
+        std::string votoUltimo = (ultimo->getVotos() == 1) ? "voto" : "votos";
 
-        cout << posicao++ << " - "
-             << partido->getSigla() << " - " 
-             << partido->getNumero() << ", "
-             << primeiro->getNomeUrna(0) << " ("
-             << primeiro->getNumero() << ", "
-             << ProcessaEntrada::formataNumero(primeiro->getVotos()) << " " << votoPrimeiro << ") / "
-             << ultimo->getNomeUrna(0) << " ("
-             << ultimo->getNumero() << ", "
-             << ProcessaEntrada::formataNumero(ultimo->getVotos()) << " " << votoUltimo << ")\n";
+        std::cout << posicao++ << " - "
+                  << partido->getSigla() << " - " 
+                  << partido->getNumero() << ", "
+                  << primeiro->getNomeUrna(0) << " ("
+                  << primeiro->getNumero() << ", "
+                  << ProcessaEntrada::formataNumero(primeiro->getVotos()) << " " << votoPrimeiro << ") / "
+                  << ultimo->getNomeUrna(0) << " ("
+                  << ultimo->getNumero() << ", "
+                  << ProcessaEntrada::formataNumero(ultimo->getVotos()) << " " << votoUltimo << ")\n";
     }
 }
 
 void Eleicao::geraRelatorioFaixaEtaria() {
-    int total = this->candidatosEleitos.size();
+    int total = this->numEleitos;
     
     vector<int> faixas(5, 0); // [<30, 30-39, 40-49, 50-59, >=60]
 
-    for (Candidato* candidato : candidatosEleitos) {
+    for (auto candidato : candidatosEleitos) {
         int idade = candidato->getIdade(data);
         if (idade < 30)        faixas[0]++;
         else if (idade < 40)   faixas[1]++;
@@ -504,12 +450,12 @@ void Eleicao::geraRelatorioFaixaEtaria() {
 }
 
 void Eleicao::geraRelatorioGenero() {
-    int total = this->candidatosEleitos.size();
+    int total = this->numEleitos;
 
     int feminino = 0;
     int masculino = 0;
 
-    for (Candidato* candidato : candidatosEleitos) {
+    for (auto candidato : candidatosEleitos) {
         Genero genero = candidato->getGenero();
         if (genero.getCodigo() == Genero::FEMININO)  feminino++;
         else if (genero.getCodigo() == Genero::MASCULINO) masculino++;
@@ -544,9 +490,9 @@ void Eleicao::gerarRelatorios() {
     cout << "Número de vagas: " << this->candidatosEleitos.size() << endl; // Relatorio 1
     geraRelatorioVereadoresEleitos(); // Relatorio 2
     geraRelatoriosSobreMaisVotados(); // Relatorios 3, 4 e 5
-    //geraRelatorioVotacaoPartidos(); // Relatorio 6
-    //geraRelatorioPrimeiroUltimoPartido(); // Relatorio 7
-    /*geraRelatorioFaixaEtaria(); // Relatorio 8
+    geraRelatorioVotacaoPartidos(); // Relatorio 6
+    geraRelatorioPrimeiroUltimoPartido(); // Relatorio 7
+    geraRelatorioFaixaEtaria(); // Relatorio 8
     geraRelatorioGenero(); // Relatorio 9
-    geraRelatorioTotalVotos(); // Relatorio 10*/
+    geraRelatorioTotalVotos(); // Relatorio 10
 }

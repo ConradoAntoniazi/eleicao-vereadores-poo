@@ -6,12 +6,12 @@
 
 using namespace std;
 
-Candidato::Candidato(const int& numero, const string& nomeUrna, Partido &partido,
+Candidato::Candidato(const int& numero, const string& nomeUrna, std::shared_ptr<Partido> partido,
                      const string &dataNascStr, const int& genero, const int& situacao)
     : votos(0),          
     numero(numero),     
     nomeUrna(nomeUrna), 
-    partido(&partido),  
+    partido(partido),  
     dataNascimento(DataUtils::fromString(dataNascStr)), 
     genero(Genero::fromCodigo(genero)),               
     situacaoEleitoral(SituacaoEleitoral::fromCodigo(situacao))
@@ -22,16 +22,20 @@ int Candidato::getNumero() const { return numero; }
 
 string Candidato::getNomeUrna(int flagFederado) const
 {
-    if (partido->getNumeroFederacao() != -1 && flagFederado != 0)
-    {
+    auto part = this->getPartido();
+    if (part && part->getNumeroFederacao() != -1 && flagFederado != 0)
         return "*" + nomeUrna;
-    }
     return nomeUrna;
 }
 
-Partido &Candidato::getPartido() const { return *partido; }
+std::shared_ptr<Partido> Candidato::getPartido() const {
+    return partido.lock();
+}
+
 int Candidato::getVotos() const { return votos; }
+
 Genero Candidato::getGenero() const { return genero; }
+
 DataUtils Candidato::getDataNascimento() const { return dataNascimento; }
 
 bool Candidato::isEleito() const

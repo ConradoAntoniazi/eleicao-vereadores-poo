@@ -1,24 +1,25 @@
 #ifndef ELEICAO_HPP
 #define ELEICAO_HPP
 
-#include <string>
-#include <stdexcept>
-#include <map>
-#include <vector>
-
 #include "DataUtils.hpp"
 #include "Candidato.hpp"
 #include "Partido.hpp"
 
+#include <string>
+#include <stdexcept>
+#include <map>
+#include <vector>
+#include <memory>
+
 class Eleicao {
 private:
-    const int codigoCidade;
-    const string data;
     int numEleitos;
+    const int codigoCidade;
+    const std::string data;
 
-    std::vector<Candidato*> candidatosEleitos;
-    std::map<int, Candidato*> candidatos;
-    std::map<int, Partido*> partidos;
+    std::vector<std::shared_ptr<Candidato>> candidatosEleitos;
+    std::map<int, std::shared_ptr<Candidato>> candidatos;
+    std::map<int, std::shared_ptr<Partido>> partidos;
 
     void geraRelatorioVereadoresEleitos();
     void geraRelatoriosSobreMaisVotados();
@@ -29,18 +30,13 @@ private:
     void geraRelatorioTotalVotos();
 
 public:
-    Eleicao(const int& condigo,const string& dataStr);
-
-    ~Eleicao() {
-        for (auto& pair : candidatos) delete pair.second;
-        for (auto& pair : partidos) delete pair.second;
-    }
+    Eleicao(const int& condigo,const std::string& dataStr);
 
     // getters na implementacao em java nao eram usados
     // entao serao ignorados aqui
 
-    void processarCandidatosPartidos(const string& caminhoArquivo);
-    void processarVotos(const string& caminhoArquivo);
+    void processarCandidatosPartidos(const std::string& caminhoArquivo);
+    void processarVotos(const std::string& caminhoArquivo);
     void gerarRelatorios();
 };
 

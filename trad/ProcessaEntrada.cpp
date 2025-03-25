@@ -7,6 +7,8 @@
 #include <iomanip>
 #include <iostream>
 
+using namespace std;
+
 string ProcessaEntrada::iso_8859_1_to_utf8(string &str)
 {
   // adaptado de: https://stackoverflow.com/a/39884120 :-)

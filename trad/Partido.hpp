@@ -4,38 +4,41 @@
 #include <vector>
 #include <list>
 #include <string>
-
-using namespace std;
+#include <memory>
 
 class Candidato; //forward reference
 
 class Partido {
 private:
     int numero;
-    string sigla;
-    string nome;
+    std::string sigla;
+    std::string nome;
     int numeroFederacao;
     int votosLegenda;
-    list<Candidato*> candidatos; 
+    // simetrico ao que ocorre em candidato, partido 
+    // tambem evita a responsabilidade do ciclo de vida dos
+    // ponteiros que guarda de candidato 
+    std::list<std::weak_ptr<Candidato>> candidatos; 
 public:
-    Partido(const int& numero, const string& sigla, const string& nome, const int& numeroFed);
+    Partido(const int& numero, const std::string& sigla, const std::string& nome, const int& numeroFed);
     
     // Getters
     int getNumero() const;
-    string getSigla() const;
-    string getNome() const;
+    std::string getSigla() const;
+    std::string getNome() const;
     int getNumeroFederacao() const;
     int getVotosLegenda() const;
-    const list<Candidato*>& getCandidatos() const;
+    std::vector<std::shared_ptr<Candidato>> getCandidatos() const;
+    //
     
     void addVotosLegenda(int votos);
-    void addCandidato(Candidato* candidato); 
+    void addCandidato(std::shared_ptr<Candidato> candidato); 
     int getVotosNominais() const;
     int getTotalVotos() const;
     int getNumEleitos() const;
     
-    list<Candidato*> getCandidatosValidos() const;
-    Candidato* getCandidatoMaisVotado() const;
+    std::vector<std::shared_ptr<Candidato>> getCandidatosValidos() const;
+    std::shared_ptr<Candidato> getCandidatoMaisVotado() const;
 };
 
 #endif
