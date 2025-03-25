@@ -26,6 +26,9 @@ int main(int argc, char* argv[]) {
         eleicao.processarCandidatosPartidos(arquivoCandidatos);
         eleicao.processarVotos(arquivoVotacao);
         
+        setlocale(LC_ALL, "pt_BR.UTF-8");
+        cout.imbue(locale("pt_BR.UTF-8"));
+
         eleicao.gerarRelatorios();
 
     } catch (const exception& e) {

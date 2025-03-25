@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 string ProcessaEntrada::iso_8859_1_to_utf8(string &str)
 {
@@ -56,6 +57,10 @@ string ProcessaEntrada::formataNumero(const int& numero) {
 }
 
 string ProcessaEntrada::formataPercentual(const int& qtd, const int& total){
+  if(total <= 0){
+    cout << "ERRO EM FORMATA PERCENTUAL" << endl;
+  }
+  
   double percent = (total > 0) ? ((qtd * 100.0) / total) : 0.0;
   stringstream ss;
   ss << fixed << setprecision(2) << percent << "%";

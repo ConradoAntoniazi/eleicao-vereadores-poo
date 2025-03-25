@@ -277,7 +277,7 @@ void Eleicao::geraRelatorioVereadoresEleitos() {
         });
 
     // Imprime o relatório
-    cout << "Vereadores eleitos:\n";
+    cout << "\nVereadores eleitos:\n";
     int posicao = 1;
     for (const auto& candidato : candidatosEleitos) {
         cout << posicao << " - " 
@@ -482,8 +482,7 @@ void Eleicao::geraRelatorioPrimeiroUltimoPartido(){
 }
 
 void Eleicao::geraRelatorioFaixaEtaria() {
-    int total = numEleitos;
-    if (total == 0) return;
+    int total = this->candidatosEleitos.size();
     
     vector<int> faixas(5, 0); // [<30, 30-39, 40-49, 50-59, >=60]
 
@@ -501,13 +500,12 @@ void Eleicao::geraRelatorioFaixaEtaria() {
     cout << "30 <= Idade < 40: " << faixas[1] << " (" << ProcessaEntrada::formataPercentual(faixas[1], total) << ")\n";
     cout << "40 <= Idade < 50: " << faixas[2] << " (" << ProcessaEntrada::formataPercentual(faixas[2], total) << ")\n";
     cout << "50 <= Idade < 60: " << faixas[3] << " (" << ProcessaEntrada::formataPercentual(faixas[3], total) << ")\n";
-    cout << "60 <= Idade    : " << faixas[4] << " (" << ProcessaEntrada::formataPercentual(faixas[4], total) << ")\n";
+    cout << "60 <= Idade: " << faixas[4] << " (" << ProcessaEntrada::formataPercentual(faixas[4], total) << ")\n";
 }
 
 void Eleicao::geraRelatorioGenero() {
-    int total = this->numEleitos;
-    if (total == 0) return;
-    
+    int total = this->candidatosEleitos.size();
+
     int feminino = 0;
     int masculino = 0;
 
@@ -543,12 +541,12 @@ void Eleicao::geraRelatorioTotalVotos() {
 }
 
 void Eleicao::gerarRelatorios() {
-    cout << "Número de vagas: " << this->numEleitos << endl; // Relatorio 1
+    cout << "Número de vagas: " << this->candidatosEleitos.size() << endl; // Relatorio 1
     geraRelatorioVereadoresEleitos(); // Relatorio 2
     geraRelatoriosSobreMaisVotados(); // Relatorios 3, 4 e 5
-    geraRelatorioVotacaoPartidos(); // Relatorio 6
-    geraRelatorioPrimeiroUltimoPartido(); // Relatorio 7
-    geraRelatorioFaixaEtaria(); // Relatorio 8
+    //geraRelatorioVotacaoPartidos(); // Relatorio 6
+    //geraRelatorioPrimeiroUltimoPartido(); // Relatorio 7
+    /*geraRelatorioFaixaEtaria(); // Relatorio 8
     geraRelatorioGenero(); // Relatorio 9
-    geraRelatorioTotalVotos(); // Relatorio 10
+    geraRelatorioTotalVotos(); // Relatorio 10*/
 }
