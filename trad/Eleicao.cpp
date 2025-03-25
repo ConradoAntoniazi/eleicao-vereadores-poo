@@ -186,12 +186,14 @@ void Eleicao::processarVotos(const string &caminhoArquivo) {
             }
             campos.push_back(linha.substr(start)); // Último campo
 
-            if (campos.size() < 22) {
+            if (campos.size() < (COLUNA_VOTACAO_QTD_VOTOS + 1)) {
                 cerr << "Linha com campos insuficientes" << endl;
                 continue;
             }
 
             char *endPtr;
+            // a string respectiva e convertida para um ponteiro para char, endptr apontara
+            // para o caractere imediatamente convertido, 10 indica que usaremos base decimal
             int codigoCargo = strtol(campos[COLUNA_VOTACAO_CODIGO_CARGO].c_str(), &endPtr, 10);
             int codigoMunicipio = strtol(campos[COLUNA_VOTACAO_CODIGO_MUNICIPO].c_str(), &endPtr, 10);
             int numeroVotavel = strtol(campos[COLUNA_VOTACAO_NUMERO_VOTAVEL].c_str(), &endPtr, 10);

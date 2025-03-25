@@ -104,16 +104,16 @@ Primeiro e último colocados de cada partido:
 17 - PDT - 12, PEDRO TÁPIAS (12.181, 195 votos) / MARLI DO TRAILER (12.190, 24 votos)
 
 Eleitos, por faixa etária (na data da eleição):
-      Idade < 30: 0 (0.00%)
-30 <= Idade < 40: 6 (28.57%)
-40 <= Idade < 50: 8 (38.10%)
-50 <= Idade < 60: 4 (19.05%)
-60 <= Idade: 3 (14.29%)
+      Idade < 30: 0 (0,00%)
+30 <= Idade < 40: 6 (28,57%)
+40 <= Idade < 50: 8 (38,10%)
+50 <= Idade < 60: 4 (19,05%)
+60 <= Idade: 3 (14,29%)
 
 Eleitos, por gênero:
-Feminino: 3 (14.29%)
-Masculino: 18 (85.71%)
+Feminino: 3 (14,29%)
+Masculino: 18 (85,71%)
 
 Total de votos válidos:    184.298
-Total de votos nominais:    178.131 (96.65%)
-Total de votos de legenda: 6.167 (3.35%)
+Total de votos nominais:    178.131 (96,65%)
+Total de votos de legenda: 6.167 (3,35%)

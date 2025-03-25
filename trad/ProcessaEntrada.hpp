@@ -6,7 +6,6 @@
 class ProcessaEntrada{
 public:
     static std::string iso_8859_1_to_utf8(std::string &str);
-    static bool compare_pt_BR(const std::string &s1, const std::string &s2);
     static void trim(std::string &str);
     static void removeAspas(std::string &str);
     static std::string formataNumero(const int& numero);

@@ -33,14 +33,6 @@ string ProcessaEntrada::iso_8859_1_to_utf8(string &str)
   return strOut;
 }
 
-bool ProcessaEntrada::compare_pt_BR(const string &s1, const string &s2)
-{
-  locale loc = locale("pt_BR.UTF-8");
-  const collate<char> &col = use_facet<collate<char>>(loc);
-  return (col.compare(s1.data(), s1.data() + s1.size(),
-                      s2.data(), s2.data() + s2.size()) < 0);
-}
-
 void ProcessaEntrada::trim(string &str)
 {
   str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
@@ -53,7 +45,6 @@ void ProcessaEntrada::removeAspas(string &str){
 
 string ProcessaEntrada::formataNumero(const int& numero) {
   stringstream ss;
-  ss.imbue(locale("pt_BR.UTF-8"));
   ss << fixed << numero;
   return ss.str();
 }
