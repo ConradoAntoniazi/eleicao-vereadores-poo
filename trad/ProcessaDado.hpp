@@ -1,9 +1,9 @@
-#ifndef PROCESSA_ENTRADA_HPP
-#define PROCESSA_ENTRADA_HPP
+#ifndef PROCESSA_DADO_HPP
+#define PROCESSA_DADO_HPP
 
 #include <string>
 
-class ProcessaEntrada{
+class ProcessaDado{
 public:
     static std::string iso_8859_1_to_utf8(std::string &str);
     static void trim(std::string &str);
@@ -12,4 +12,4 @@ public:
     static std::string formataPercentual(const int& qtd, const int& total);
 };
 
-#endif // PROCESSA_ENTRADA_HPP
+#endif // PROCESSA_DADO_HPP
