@@ -66,7 +66,8 @@ void Eleicao::processarCandidatosPartidos(const string &caminhoArquivo)
                 campos.push_back(campo);
             }
 
-            // Sempre colocar o maior idx de coluna observado aqui
+            // O maior idx de coluna observado aqui indica o minimo
+            // de campos que devemos ter
             if (campos.size() < (COLUNA_SITUACAO_CANDIDATO + 1))
             {
                 throw out_of_range("Linha com campos insuficientes");
@@ -317,7 +318,7 @@ void Eleicao::geraRelatoriosSobreMaisVotados()
         posicao++;
     }
 
-    // Relatório: Candidatos que seriam eleitos no sistema majoritário
+    // Relatorio: Candidatos que seriam eleitos no sistema majoritário
     std::cout << "\nTeriam sido eleitos se a votação fosse majoritária, e não foram eleitos:\n"
               << "(com sua posição no ranking de mais votados)\n";
     for (const auto &candidato : candidatosSeriamEleitos)
@@ -335,7 +336,7 @@ void Eleicao::geraRelatoriosSobreMaisVotados()
         }
     }
 
-    // Relatório: Candidatos beneficiados pelo sistema proporcional
+    // Relatorio: Candidatos beneficiados pelo sistema proporcional
     std::cout << "\nEleitos, que se beneficiaram do sistema proporcional:\n"
               << "(com sua posição no ranking de mais votados)\n";
     for (const auto &candidato : candidatosEleitosPorProporcionalidade)
@@ -380,7 +381,7 @@ void Eleicao::geraRelatorioVotacaoPartidos()
         int totalVotos = partido->getTotalVotos();
         int numEleitos = partido->getNumEleitos();
 
-        // Pluralização das strings
+        // Pluralizacao das strings
         std::string votoStr = (totalVotos <= 1) ? "voto" : "votos";
         std::string votoNominalStr = (votosNominais <= 1) ? "nominal" : "nominais";
         std::string candidatoStr = (numEleitos <= 1) ? "candidato eleito" : "candidatos eleitos";
@@ -447,7 +448,7 @@ void Eleicao::geraRelatorioPrimeiroUltimoPartido()
         if (partido->getCandidatos().size() == 1)
             continue;
 
-        // Obtém e ordena os candidatos válidos
+        // Obtem e ordena os candidatos válidos
         std::vector<std::shared_ptr<Candidato>> candidatos = partido->getCandidatos();
         std::sort(candidatos.begin(), candidatos.end(),
                   [](const std::shared_ptr<Candidato> &a, const std::shared_ptr<Candidato> &b)

@@ -22,6 +22,8 @@ int Partido::getVotosLegenda() const { return votosLegenda; }
 std::vector<std::shared_ptr<Candidato>> Partido::getCandidatos() const {
     std::vector<std::shared_ptr<Candidato>> result;
     for (auto& wk : candidatos) {
+        // weak_ptr precisa ser convertido para shared_ptr para acessar o objeto
+        // Se o objeto original já tiver sido destruído, lock() retorna nullptr
         if(auto sp = wk.lock()) {
             result.push_back(sp);
         }
@@ -33,12 +35,15 @@ std::vector<std::shared_ptr<Candidato>> Partido::getCandidatos() const {
 void Partido::addVotosLegenda(int votos) { votosLegenda += votos; }
 
 void Partido::addCandidato(std::shared_ptr<Candidato> candidato) {
+    // Armazena apenas uma referência fraca ao candidato para evitar gerenciamento de ciclo de vida aqui
+    // Isso impede que Partido mantenha o Candidato vivo "à força"
     candidatos.push_back(candidato);
 }
 
 int Partido::getVotosNominais() const {
     int total = 0;
     for (auto& wk : candidatos) {
+        // lock() falha silenciosamente se o Candidato não existir mais
         if(auto sp = wk.lock()) {
             total += sp->getVotos();
         }

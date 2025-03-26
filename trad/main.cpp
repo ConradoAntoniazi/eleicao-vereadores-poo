@@ -30,8 +30,6 @@ int main(int argc, char* argv[]) {
         locale::global(locale("pt_BR.UTF-8"));
         // definindo locale para evitar o default
         setlocale(LC_ALL, "pt_BR");
-        // definindo localde do cout
-        //cout.imbue(locale("pt_BR.UTF-8"));
 
         eleicao.gerarRelatorios();
 

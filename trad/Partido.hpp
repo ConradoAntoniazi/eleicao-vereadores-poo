@@ -18,7 +18,7 @@ private:
     std::string sigla; ///< Sigla do partido.
     std::string nome; ///< Nome completo do partido.
     int numeroFederacao; ///< Número da federação do partido.
-    int votosLegenda = 0; ///< Total de votos de legenda recebidos pelo partido.
+    int votosLegenda; ///< Total de votos de legenda recebidos pelo partido.
 
     /**
      * Lista de candidatos do partido.
