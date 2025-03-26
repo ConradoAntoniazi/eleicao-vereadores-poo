@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
         eleicao.processarVotos(arquivoVotacao);
         
         // definindo o locale globalmente
-        std::locale::global(locale("pt_BR.UTF-8"));
+        locale::global(locale("pt_BR.UTF-8"));
         // definindo locale para evitar o default
         setlocale(LC_ALL, "pt_BR");
         // definindo localde do cout

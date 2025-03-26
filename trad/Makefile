@@ -46,4 +46,4 @@ run: $(EXECUTAVEL)
 
 # comando para limpeza
 clean: 
-	@rm *.o $(EXECUTAVEL) *.csv *.txt
+	@rm *.o $(EXECUTAVEL)
