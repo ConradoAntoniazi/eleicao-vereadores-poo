@@ -1,6 +1,9 @@
-# 📰 Apurador de Vereadores — Versão Java 🚀
+# 📰 Apurador de Eleicao para Vereadores
+
+---
 
 Este projeto em **Java** processa os resultados da eleição municipal para **vereadores**, utilizando dados oficiais do TSE (Tribunal Superior Eleitoral). Com ele, você pode analisar facilmente os votos nominais, votos de legenda, eleitos, suplentes e muito mais!
+
 ---
 
 ## ✨ O que este programa faz?
