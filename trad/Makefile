@@ -1,11 +1,8 @@
 ############
 # Exemplo de makefile
 # Prof. João Paulo A. Almeida
-# Programação OO
-# 
-# A princípio, você não precisa alterar nada, mas aqui assume-se que o diretório atual
-# é o diretório onde está o Makefile, e os códigos fonte estão em src/.
-#
+# Programação OO 
+
 
 # nome do compilador
 CPP = g++
@@ -23,11 +20,6 @@ OBJETOS := $(addprefix src/,$(OBJETOS))
 
 # nome do arquivo executável
 EXECUTAVEL = vereadores
-
-############ alvos
-#
-# use @ antes de todos os comandos, pois é necessário no script de teste
-#
 
 # alvo principal é o executável
 all: $(EXECUTAVEL)
