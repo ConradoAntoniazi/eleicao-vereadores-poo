@@ -69,39 +69,39 @@ Votação dos partidos e número de candidatos eleitos:
 9 - PRD - 25, 9.547 votos (9.427 nominais e 120 de legenda), 1 candidato eleito
 10 - MDB - 15, 9.256 votos (9.137 nominais e 119 de legenda), 1 candidato eleito
 11 - PSOL - 50, 7.757 votos (7.291 nominais e 466 de legenda), 1 candidato eleito
-12 - DC - 27, 5.712 votos (5.667 nominais e 45 de legenda), 0 candidatos eleitos
+12 - DC - 27, 5.712 votos (5.667 nominais e 45 de legenda), 0 candidato eleito
 13 - PV - 43, 3.580 votos (3.541 nominais e 39 de legenda), 1 candidato eleito
-14 - AGIR - 36, 1.471 votos (1.454 nominais e 17 de legenda), 0 candidatos eleitos
-15 - PDT - 12, 1.362 votos (1.199 nominais e 163 de legenda), 0 candidatos eleitos
-16 - REDE - 18, 1.121 votos (1.081 nominais e 40 de legenda), 0 candidatos eleitos
-17 - PC do B - 65, 498 votos (484 nominais e 14 de legenda), 0 candidatos eleitos
-18 - CIDADANIA - 23, 0 voto (0 nominais e 0 de legenda), 0 candidato eleito
-19 - PRTB - 28, 0 voto (0 nominais e 0 de legenda), 0 candidato eleito
-20 - MOBILIZA - 33, 0 voto (0 nominais e 0 de legenda), 0 candidato eleito
-21 - PMB - 35, 0 voto (0 nominais e 0 de legenda), 0 candidato eleito
-22 - UNIÃO - 44, 0 voto (0 nominais e 0 de legenda), 0 candidato eleito
-23 - PSDB - 45, 0 voto (0 nominais e 0 de legenda), 0 candidato eleito
-24 - PSD - 55, 0 voto (0 nominais e 0 de legenda), 0 candidato eleito
-25 - AVANTE - 70, 0 voto (0 nominais e 0 de legenda), 0 candidato eleito
+14 - AGIR - 36, 1.471 votos (1.454 nominais e 17 de legenda), 0 candidato eleito
+15 - PDT - 12, 1.362 votos (1.199 nominais e 163 de legenda), 0 candidato eleito
+16 - REDE - 18, 1.121 votos (1.081 nominais e 40 de legenda), 0 candidato eleito
+17 - PC do B - 65, 498 votos (484 nominais e 14 de legenda), 0 candidato eleito
+18 - CIDADANIA - 23, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito
+19 - PRTB - 28, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito
+20 - MOBILIZA - 33, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito
+21 - PMB - 35, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito
+22 - UNIÃO - 44, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito
+23 - PSDB - 45, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito
+24 - PSD - 55, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito
+25 - AVANTE - 70, 0 voto (0 nominal e 0 de legenda), 0 candidato eleito
 
 Primeiro e último colocados de cada partido:
-1 - PT - 13, KARLA  COSER (13.013, 7.256 votos) / DETE GOMES (13.033, 39 votos)
-2 - REPUBLICANOS - 10, AYLTON DADALTO (10.500, 5.218 votos) / ELIANE ROSSI (10.555, 32 votos)
-3 - PL - 22, DARCIO BRACARENSE (22.222, 4.101 votos) / TANIA PIUBEL (22.234, 17 votos)
-4 - PODE - 20, ANDRÉ BRANDINO (20.100, 3.584 votos) / KARINA SOARES (20.177, 22 votos)
-5 - PSB - 40, BRUNO MALIAS (40.456, 3.079 votos) / MARIANGELA ZACCHE (40.240, 25 votos)
-6 - PP - 11, ANDERSON GOGGI (11.456, 2.937 votos) / DILTON RUAS (11.555, 53 votos)
-7 - PV - 43, LUIZ PAULO AMORIM (43.111, 2.789 votos) / CLEO SILVA (43.444, 37 votos)
-8 - PRD - 25, MAURICIO LEITE (25.123, 2.728 votos) / DIEGO ESPETÃO (25.999, 2 votos)
-9 - PSOL - 50, ANA PAULA ROCHA (50.321, 2.670 votos) / WEVERTON BARCELLOS (50.073, 19 votos)
-10 - NOVO - 30, LEONARDO MONJARDIM (30.123, 2.449 votos) / ZILDA SPINETTI (30.131, 25 votos)
-11 - SOLIDARIEDADE - 77, DALTO NEVES (77.777, 2.345 votos) / LUCIENE TATAGIBA (77.200, 9 votos)
-12 - MDB - 15, JOÃO FLAVIO (15.444, 1.541 votos) / REGINA (15.700, 33 votos)
-13 - REDE - 18, CRISLAYNE ZEFERINA (18.000, 966 votos) / JOSÉ RENATO (18.999, 46 votos)
-14 - DC - 27, ALEXANDRE TESTINHA (27.222, 810 votos) / ANDREA ALMEIDA (27.234, 21 votos)
-15 - PC do B - 65, NAMY CHEQUER (65.123, 459 votos) / FERNANDA GOMES (65.265, 25 votos)
-16 - AGIR - 36, AMARILDO SORRISO (36.100, 256 votos) / HELENA AGENTE DE SAÚDE (36.300, 25 votos)
-17 - PDT - 12, PEDRO TÁPIAS (12.181, 195 votos) / MARLI DO TRAILER (12.190, 24 votos)
+1 - PT - 13, KARLA  COSER (13013, 7.256 votos) / DETE GOMES (13033, 39 votos)
+2 - REPUBLICANOS - 10, AYLTON DADALTO (10500, 5.218 votos) / ELIANE ROSSI (10555, 32 votos)
+3 - PL - 22, DARCIO BRACARENSE (22222, 4.101 votos) / TANIA PIUBEL (22234, 17 votos)
+4 - PODE - 20, ANDRÉ BRANDINO (20100, 3.584 votos) / KARINA SOARES (20177, 22 votos)
+5 - PSB - 40, BRUNO MALIAS (40456, 3.079 votos) / MARIANGELA ZACCHE (40240, 25 votos)
+6 - PP - 11, ANDERSON GOGGI (11456, 2.937 votos) / DILTON RUAS (11555, 53 votos)
+7 - PV - 43, LUIZ PAULO AMORIM (43111, 2.789 votos) / CLEO SILVA (43444, 37 votos)
+8 - PRD - 25, MAURICIO LEITE (25123, 2.728 votos) / DIEGO ESPETÃO (25999, 2 votos)
+9 - PSOL - 50, ANA PAULA ROCHA (50321, 2.670 votos) / WEVERTON BARCELLOS (50073, 19 votos)
+10 - NOVO - 30, LEONARDO MONJARDIM (30123, 2.449 votos) / ZILDA SPINETTI (30131, 25 votos)
+11 - SOLIDARIEDADE - 77, DALTO NEVES (77777, 2.345 votos) / LUCIENE TATAGIBA (77200, 9 votos)
+12 - MDB - 15, JOÃO FLAVIO (15444, 1.541 votos) / REGINA (15700, 33 votos)
+13 - REDE - 18, CRISLAYNE ZEFERINA (18000, 966 votos) / JOSÉ RENATO (18999, 46 votos)
+14 - DC - 27, ALEXANDRE TESTINHA (27222, 810 votos) / ANDREA ALMEIDA (27234, 21 votos)
+15 - PC do B - 65, NAMY CHEQUER (65123, 459 votos) / FERNANDA GOMES (65265, 25 votos)
+16 - AGIR - 36, AMARILDO SORRISO (36100, 256 votos) / HELENA AGENTE DE SAÚDE (36300, 25 votos)
+17 - PDT - 12, PEDRO TÁPIAS (12181, 195 votos) / MARLI DO TRAILER (12190, 24 votos)
 
 Eleitos, por faixa etária (na data da eleição):
       Idade < 30: 0 (0,00%)

@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
         // definindo locale para evitar o default
         setlocale(LC_ALL, "pt_BR");
         // definindo localde do cout
-        cout.imbue(locale("pt_BR.UTF-8"));
+        //cout.imbue(locale("pt_BR.UTF-8"));
 
         eleicao.gerarRelatorios();
 

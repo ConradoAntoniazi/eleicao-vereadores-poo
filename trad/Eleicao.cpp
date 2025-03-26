@@ -255,11 +255,13 @@ void Eleicao::geraRelatorioVereadoresEleitos()
     int posicao = 1;
     for (const auto &candidato : sortedCandidates)
     {
+        int votos = candidato->getVotos();
         // Agora getPartido() retorna um shared_ptr, entao usa-se "->" para acessar getSigla()
         std::cout << posicao << " - "
                   << candidato->getNomeUrna(1) << " ("
                   << candidato->getPartido()->getSigla() << ", "
-                  << ProcessaDado::formataNumero(candidato->getVotos()) << " votos)\n";
+                  << ProcessaDado::formataNumero(votos)
+                  << (votos == 1 ? " voto" : " votos") << ")\n";
         posicao++;
     }
     std::cout << "\n"; // Espaço entre relatórios
@@ -291,10 +293,12 @@ void Eleicao::geraRelatoriosSobreMaisVotados()
     {
         if (posicao <= this->numEleitos)
         {
+            int votos = candidato->getVotos();
             std::cout << posicao << " - "
                       << candidato->getNomeUrna(1) << " ("
                       << candidato->getPartido()->getSigla() << ", "
-                      << ProcessaDado::formataNumero(candidato->getVotos()) << " votos)\n";
+                      << ProcessaDado::formataNumero(votos)
+                      << (votos == 1 ? " voto" : " votos") << ")\n";
         }
 
         // Se candidato não foi eleito mas está dentro do número de vagas,
@@ -321,11 +325,13 @@ void Eleicao::geraRelatoriosSobreMaisVotados()
         auto it = std::find(candidatosMaisVotados.begin(), candidatosMaisVotados.end(), candidato);
         if (it != candidatosMaisVotados.end())
         {
+            int votos = candidato->getVotos();
             int pos = std::distance(candidatosMaisVotados.begin(), it) + 1;
             std::cout << pos << " - "
                       << candidato->getNomeUrna(1) << " ("
                       << candidato->getPartido()->getSigla() << ", "
-                      << ProcessaDado::formataNumero(candidato->getVotos()) << " votos)\n";
+                      << ProcessaDado::formataNumero(votos)
+                      << (votos == 1 ? " voto" : " votos") << ")\n";
         }
     }
 
@@ -337,11 +343,13 @@ void Eleicao::geraRelatoriosSobreMaisVotados()
         auto it = std::find(candidatosMaisVotados.begin(), candidatosMaisVotados.end(), candidato);
         if (it != candidatosMaisVotados.end())
         {
+            int votos = candidato->getVotos();
             int pos = std::distance(candidatosMaisVotados.begin(), it) + 1;
             std::cout << pos << " - "
                       << candidato->getNomeUrna(1) << " ("
                       << candidato->getPartido()->getSigla() << ", "
-                      << ProcessaDado::formataNumero(candidato->getVotos()) << " votos)\n";
+                      << ProcessaDado::formataNumero(votos)
+                      << (votos == 1 ? " voto" : " votos") << ")\n";
         }
     }
 }
@@ -373,9 +381,9 @@ void Eleicao::geraRelatorioVotacaoPartidos()
         int numEleitos = partido->getNumEleitos();
 
         // Pluralização das strings
-        std::string votoStr = (totalVotos == 1) ? "voto" : "votos";
-        std::string votoNominalStr = (votosNominais == 1) ? "nominal" : "nominais";
-        std::string candidatoStr = (numEleitos == 1) ? "candidato eleito" : "candidatos eleitos";
+        std::string votoStr = (totalVotos <= 1) ? "voto" : "votos";
+        std::string votoNominalStr = (votosNominais <= 1) ? "nominal" : "nominais";
+        std::string candidatoStr = (numEleitos <= 1) ? "candidato eleito" : "candidatos eleitos";
 
         if (totalVotos == 0)
         {

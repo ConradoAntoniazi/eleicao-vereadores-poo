@@ -42,7 +42,7 @@ $(EXECUTAVEL): $(OBJETOS)
 
 # comandos para execução	
 run: $(EXECUTAVEL)
-	@./$(EXECUTAVEL) 57053 in/consulta_cand_2024_ES.csv in/votacao_secao_2024_ES.csv 06/10/2024 > saida.txt
+	@./$(EXECUTAVEL) 57053 ../in/consulta_cand_2024_ES.csv ../in/votacao_secao_2024_ES.csv 06/10/2024 > saida.txt
 
 # comando para limpeza
 clean: 
