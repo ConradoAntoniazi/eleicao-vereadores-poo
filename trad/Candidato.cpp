@@ -18,6 +18,7 @@ Candidato::Candidato(const int& numero, const string& nomeUrna, std::shared_ptr<
 {}
 
 // Getters
+
 int Candidato::getNumero() const { return numero; }
 
 string Candidato::getNomeUrna(int flagFederado) const

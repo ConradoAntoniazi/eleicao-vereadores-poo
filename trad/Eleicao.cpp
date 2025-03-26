@@ -463,8 +463,8 @@ void Eleicao::geraRelatorioPrimeiroUltimoPartido()
         auto primeiro = candidatos.front();
         auto ultimo = candidatos.back();
 
-        std::string votoPrimeiro = (primeiro->getVotos() == 1) ? "voto" : "votos";
-        std::string votoUltimo = (ultimo->getVotos() == 1) ? "voto" : "votos";
+        std::string votoPrimeiro = (primeiro->getVotos() <= 1) ? "voto" : "votos";
+        std::string votoUltimo = (ultimo->getVotos() <= 1) ? "voto" : "votos";
 
         std::cout << posicao++ << " - "
                   << partido->getSigla() << " - "
